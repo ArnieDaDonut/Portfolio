@@ -79,7 +79,7 @@ export default function App() {
           <Earth position={[0, -1.5, 0]} scale={0.015} />
 
           {/* Make sure Astronaut still uses takenOff so he launches immediately! */}
-          <Astronaut position={[0, 0.2, 0]} scale={1} isTakingOff={takenOff} />
+          <Astronaut position={[0, 0.2, 0]} scale={1} isTakingOff={takenOff} inSpace={inSpace} />
 
           {/* Change takenOff to inSpace for the Planets! */}
           {inSpace && (

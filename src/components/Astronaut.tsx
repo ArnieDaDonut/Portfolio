@@ -3,7 +3,7 @@ import { useRef, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-export function Astronaut({ position = [0, 0, 0], isTakingOff = false, ...props }: any) {
+export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace = false, ...props }: any) {
   const { scene } = useGLTF('/astronaut.glb')
   const ref = useRef<THREE.Group>(null)
 
@@ -24,7 +24,7 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, ...props 
         delta * speed //Speed of drop
       )
 
-      if (!isTakingOff) {
+      if (!isTakingOff || inSpace) {
         const time = state.clock.elapsedTime
         ref.current.position.y += Math.sin(time * 3) * 0.005
         ref.current.rotation.z = Math.sin(time * 1.5) * 0.1
@@ -40,7 +40,7 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, ...props 
   return (
     <group ref={ref} {...props}>
       <primitive object={scene} />
-      {isTakingOff && (
+      {(isTakingOff && !inSpace) && (
         <group>
           <FireTrail position={[0.14, -0.16, 0.05]} active={isTakingOff} />
           <FireTrail position={[-0.14, -0.16, 0.05]} active={isTakingOff} />
@@ -52,11 +52,11 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, ...props 
 
 function FireTrail({ position, active }: { position: [number, number, number], active: boolean }) {
   const ref = useRef<THREE.Group>(null);
-  
+
   useFrame((state, delta) => {
     if (!ref.current) return;
     ref.current.rotation.y += delta * 6;
-    
+
     // Intense flickering rocket plume animation
     if (active) {
       const flicker = 1.0 + Math.sin(state.clock.elapsedTime * 45) * 0.25;
@@ -73,13 +73,13 @@ function FireTrail({ position, active }: { position: [number, number, number], a
         <coneGeometry args={[0.09, 0.38, 12]} />
         <meshStandardMaterial emissive="#ff4500" color="#f97316" transparent opacity={active ? 0.95 : 0} />
       </mesh>
-      
+
       {/* Inner yellow hot core */}
       <mesh position={[0, -0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.05, 0.24, 10]} />
         <meshStandardMaterial emissive="#ffea00" color="#facc15" transparent opacity={active ? 0.98 : 0} />
       </mesh>
-      
+
       {/* Small blue base flame for realism */}
       <mesh position={[0, 0.08, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.06, 0.04, 0.08, 8]} />
