@@ -4,22 +4,27 @@ import { Sparkles, Environment, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
 const PLANETS = [
-  { path: '/mars_the_red_planet_free.glb', name: 'About', pos: [-14, 20, 4] },
-  { path: '/saturn.glb', name: 'Projects', pos: [-7, 20, -6] },
-  { path: '/venus_fixed.glb', name: 'Experience', pos: [0, 20, -12] },
-  { path: '/purple_planet.glb', name: 'Skills', pos: [7, 20, -6] },
-  { path: '/planet_of_phoenix.glb', name: 'Contact', pos: [14, 20, 4] },
+  { path: '/mars_the_red_planet_free.glb', name: 'About', pos: [-6, 20, 10.4] }, // Bottom left
+  { path: '/saturn.glb', name: 'Projects', pos: [-12, 20, 0] }, // Left
+  { path: '/venus_fixed.glb', name: 'Experience', pos: [6, 20, 10.4] }, // Bottom right
+  { path: '/purple_planet.glb', name: 'Skills', pos: [6, 20, -10.4] }, // Top right
+  { path: '/black_hole.glb', name: 'Contact', pos: [12, 20, 0], size: 10, rotate: false }, // Right
 ]
 
 import { Earth } from './components/Earth'
 import { Astronaut } from './components/Astronaut'
 import { Planet } from './components/Planet'
+import { BlackHole } from './components/BlackHole'
 
 function CameraSnapper({ inSpace, controlsRef }: { inSpace: boolean, controlsRef: any }) {
   useEffect(() => {
     if (inSpace && controlsRef.current) {
-      controlsRef.current.object.position.set(0, 22, 10)
+      controlsRef.current.object.position.set(0, 22, 25)
       controlsRef.current.target.set(0, 20, 0)
+      controlsRef.current.update()
+    } else if (!inSpace && controlsRef.current) {
+      controlsRef.current.object.position.set(0, 2, 10)
+      controlsRef.current.target.set(0, 0, 0)
       controlsRef.current.update()
     }
   }, [inSpace])
@@ -50,6 +55,17 @@ export default function App() {
 
   }, [takenOff, fading])
 
+  const handleReturn = () => {
+    if (!inSpace || fading) return;
+    setFading(true);
+
+    setTimeout(() => {
+      setinSpace(false);
+      setTakenOff(false);
+      setFading(false);
+    }, 1500);
+  }
+
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
 
@@ -65,27 +81,59 @@ export default function App() {
         }}
       />
 
+      {!inSpace && (
+        <div className="game-title">
+          Arnav's Portfolio
+        </div>
+      )}
+
+
       <Canvas camera={{ position: [0, 2, 10], fov: 45 }}>
-        <color attach="background" args={['#050511']} />
+        <color attach="background" args={['#0f1a30']} />
 
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
 
-        <Sparkles count={7000} scale={50} size={5} speed={0.4} />
+        <Sparkles count={5000} scale={50} size={5} speed={0.4} />
 
         <Suspense fallback={null}>
           <Environment preset="night" />
 
-          <Earth position={[0, -1.5, 0]} scale={0.015} />
+          {!inSpace && <Earth position={[0, -1.5, 0]} scale={0.015} />}
 
           {/* Make sure Astronaut still uses takenOff so he launches immediately! */}
-          <Astronaut position={[0, 0.2, 0]} scale={1} isTakingOff={takenOff} inSpace={inSpace} />
+          <Astronaut position={[0, 0.2, 0]} scale={inSpace ? 2 : 1} isTakingOff={takenOff} inSpace={inSpace} />
 
           {/* Change takenOff to inSpace for the Planets! */}
           {inSpace && (
             <Suspense fallback={null}>
+
+              <group onClick={handleReturn} onPointerOver={() =>
+                document.body.style.cursor = 'pointer'} onPointerOut={() =>
+                  document.body.style.cursor = 'auto'}>
+                <Earth position={[-6, 20, -10.4]} scale={0.015} label="Home" />
+              </group>
+
               {PLANETS.map((planet, i) => (
-                <Planet key={i} modelPath={planet.path} position={planet.pos} scale={0.05} onClick={() => { console.log(`Clicked on ${planet.name}`) }} />
+                planet.name === 'Contact' ? (
+                  <BlackHole
+                    key={i}
+                    position={planet.pos}
+                    label={planet.name}
+                    onClick={() => { console.log(`Clicked on ${planet.name}`) }}
+                  />
+                ) : (
+                  <Planet
+                    key={i}
+                    modelPath={planet.path}
+                    position={planet.pos}
+                    targetSize={planet.size || 3.5}
+                    rotate={planet.rotate}
+                    scale={0.05}
+                    label={planet.name}
+                    onClick={() => { console.log(`Clicked on ${planet.name}`) }}
+                  />
+                )
               ))}
             </Suspense>
           )}

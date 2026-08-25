@@ -1,14 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.game-title {
+  position: absolute;
+  top: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Press Start 2P', monospace;
+  color: white;
+  font-weight: bold;
+  font-size: 2.8rem;
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.7));
+  z-index: 5;
+  pointer-events: none;
+  text-align: center;
+  width: 100%;
+}
+
+
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: #000;
+  background-color: #0f1a30;
   color: white;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
