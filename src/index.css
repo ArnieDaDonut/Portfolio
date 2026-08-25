@@ -17,6 +17,35 @@
 }
 
 
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.25
+  }
+}
+
+.takeoff-text {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Press Start 2P', monospace;
+  color: #93c5fd;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(147, 197, 253, 0.8), 0 0 20px rgba(147, 197, 253, 0.4);
+  animation: blink 1.5s infinite ease-in-out;
+  z-index: 5;
+  pointer-events: none;
+  text-align: center;
+  white-space: nowrap;
+}
+
 
 * {
   margin: 0;

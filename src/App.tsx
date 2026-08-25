@@ -87,6 +87,11 @@ export default function App() {
         </div>
       )}
 
+      {!takenOff && !inSpace && (
+        <div className="takeoff-text">
+          Press Spacebar to Take Off!
+        </div>
+      )}
 
       <Canvas camera={{ position: [0, 2, 10], fov: 45 }}>
         <color attach="background" args={['#0f1a30']} />
@@ -94,7 +99,7 @@ export default function App() {
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
 
-        <Sparkles count={5000} scale={50} size={5} speed={0.4} />
+        <Sparkles position={[0, 10, 0]} count={5000} scale={50} size={5} speed={0.4} />
 
         <Suspense fallback={null}>
           <Environment preset="night" />
