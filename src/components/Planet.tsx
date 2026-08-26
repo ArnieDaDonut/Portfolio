@@ -4,7 +4,7 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
 export function Planet({ modelPath, position, label, onClick, targetSize = 3.5, rotate = true, ...props }: any) {
-  const { scene } = useGLTF(modelPath)
+  const { scene } = useGLTF(modelPath) as any
   const ref = useRef<THREE.Group>(null)
   const [hovered, setHover] = useState(false)
 
@@ -18,7 +18,7 @@ export function Planet({ modelPath, position, label, onClick, targetSize = 3.5, 
 
     return { clonedScene: cloned, baseScale: calculatedScale }
   }, [scene, targetSize])
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (ref.current) {
       if (rotate) {
         ref.current.rotation.y += delta * 0.1

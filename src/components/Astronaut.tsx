@@ -1,30 +1,169 @@
-import { useGLTF } from '@react-three/drei'
-import { useRef, useEffect } from 'react'
+import { useFBX, useAnimations } from '@react-three/drei'
+import { useRef, useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace = false, ...props }: any) {
-  const { scene } = useGLTF('/astronaut.glb')
-  const ref = useRef<THREE.Group>(null)
+export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace = false, astroRef, ...props }: any) {
+  const fbx = useFBX('/animations/astronaut.fbx')
+  
+  // Load all animations
+  const idleFbx = useFBX('/animations/idle.fbx')
+  const walkFbx = useFBX('/animations/walking.fbx')
+  const jumpFbx = useFBX('/animations/jump.fbx')
+  const leftStrafeFbx = useFBX('/animations/left strafe walking.fbx')
+  const rightStrafeFbx = useFBX('/animations/right strafe walking.fbx')
+  const leftTurnFbx = useFBX('/animations/left turn 90.fbx')
+  const rightTurnFbx = useFBX('/animations/right turn 90.fbx')
+
+  const internalRef = useRef<THREE.Group>(null)
+  const ref = astroRef || internalRef
+  const keys = useRef<{ [key: string]: boolean }>({})
+  const currentAction = useRef<string>('Idle')
+  const isJumping = useRef(false)
+
+  // Extract and name animations, and convert them to 'In Place'
+  const anims = useMemo(() => {
+    const clips: THREE.AnimationClip[] = []
+    const addAnim = (clipFbx: any, name: string) => {
+      if (clipFbx && clipFbx.animations && clipFbx.animations.length > 0) {
+        const anim = clipFbx.animations[0].clone()
+        anim.name = name
+
+        // Fix: Strip root motion (X and Z movement) to make the animation seamlessly loop "In Place"
+        anim.tracks.forEach((track: any) => {
+          if (track.name.includes('mixamorigHips.position')) {
+            const values = track.values;
+            const startX = values[0];
+            const startZ = values[2];
+            for (let i = 0; i < values.length; i += 3) {
+              values[i] = startX;     // Lock X position to start
+              values[i+2] = startZ;   // Lock Z position to start
+            }
+          }
+        })
+
+        clips.push(anim)
+      }
+    }
+
+    addAnim(idleFbx, "Idle")
+    addAnim(walkFbx, "Walk")
+    addAnim(jumpFbx, "Jump")
+    addAnim(leftStrafeFbx, "StrafeLeft")
+    addAnim(rightStrafeFbx, "StrafeRight")
+    addAnim(leftTurnFbx, "TurnLeft")
+    addAnim(rightTurnFbx, "TurnRight")
+
+    return clips;
+  }, [idleFbx, walkFbx, jumpFbx, leftStrafeFbx, rightStrafeFbx, leftTurnFbx, rightTurnFbx])
+
+  const { actions } = useAnimations(anims, ref)
+
+  // Setup keyboard listeners
+  useEffect(() => {
+    if (!inSpace) return;
+    const handleKeyDown = (e: KeyboardEvent) => { keys.current[e.code] = true; keys.current[e.key.toLowerCase()] = true; }
+    const handleKeyUp = (e: KeyboardEvent) => { keys.current[e.code] = false; keys.current[e.key.toLowerCase()] = false; }
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [inSpace])
 
   useEffect(() => {
-    // We set the initial drop position here so it only happens ONCE when the component loads.
     if (ref.current) {
-      ref.current.position.set(position[0], -10, position[2])
+      ref.current.position.set(position[0], inSpace ? 0.2 : -10, position[2])
     }
   }, [])
 
+  const playAnim = (name: string) => {
+    if (currentAction.current !== name && actions[name]) {
+      actions[currentAction.current]?.fadeOut(0.2)
+      actions[name]?.reset().fadeIn(0.2).play()
+      currentAction.current = name
+    }
+  }
+
   useFrame((state, delta) => {
-    if (ref.current) {
+    if (!ref.current) return;
+
+    if (inSpace) {
+      const moveSpeed = 8 * delta;
+      const turnSpeed = 3 * delta;
+      
+      let isMoving = false;
+      let nextAnim = 'Idle';
+
+      // Jump Logic
+      if (keys.current['Space'] && !isJumping.current) {
+        isJumping.current = true;
+        playAnim('Jump');
+        setTimeout(() => { isJumping.current = false; }, 1000); // Reset jump after 1s
+      }
+
+      if (!isJumping.current) {
+        // Forward / Backward
+        if (keys.current['KeyW'] || keys.current['ArrowUp'] || keys.current['w']) {
+          ref.current.translateZ(moveSpeed);
+          isMoving = true;
+          nextAnim = 'Walk';
+        }
+        if (keys.current['KeyS'] || keys.current['ArrowDown'] || keys.current['s']) {
+          ref.current.translateZ(-moveSpeed * 0.5); // Walk backward slower
+          isMoving = true;
+          nextAnim = 'Walk'; // Optionally add a walk backward animation here
+        }
+
+        // Turning
+        if (keys.current['KeyA'] || keys.current['ArrowLeft'] || keys.current['a']) {
+          ref.current.rotation.y += turnSpeed;
+          if (!isMoving) nextAnim = 'TurnLeft';
+        }
+        if (keys.current['KeyD'] || keys.current['ArrowRight'] || keys.current['d']) {
+          ref.current.rotation.y -= turnSpeed;
+          if (!isMoving) nextAnim = 'TurnRight';
+        }
+
+        // Strafing (Q and E)
+        if (keys.current['KeyQ'] || keys.current['q']) {
+          ref.current.translateX(moveSpeed * 0.8);
+          isMoving = true;
+          nextAnim = 'StrafeLeft';
+        }
+        if (keys.current['KeyE'] || keys.current['e']) {
+          ref.current.translateX(-moveSpeed * 0.8);
+          isMoving = true;
+          nextAnim = 'StrafeRight';
+        }
+
+        playAnim(nextAnim);
+      }
+
+      // CAMERA FOLLOW LOGIC (True Third Person)
+      const x = ref.current.position.x;
+      const y = ref.current.position.y;
+      const z = ref.current.position.z;
+
+      const offset = new THREE.Vector3(0, 4, -12); // Negative Z to be behind the character (assuming character faces +Z)
+      offset.applyQuaternion(ref.current.quaternion);
+      
+      const targetCameraPos = new THREE.Vector3(x, y, z).add(offset);
+      state.camera.position.lerp(targetCameraPos, 0.1);
+      
+      const lookAtTarget = new THREE.Vector3(x, y + 3, z);
+      state.camera.lookAt(lookAtTarget);
+
+    } else {
+      // HOMEPAGE LOGIC
       const targetY = isTakingOff ? 20 : position[1]
       const speed = isTakingOff ? 0.5 : 2
-      ref.current.position.y = THREE.MathUtils.lerp(
-        ref.current.position.y,
-        targetY,
-        delta * speed //Speed of drop
-      )
-
-      if (!isTakingOff || inSpace) {
+      ref.current.position.y = THREE.MathUtils.lerp(ref.current.position.y, targetY, delta * speed)
+      ref.current.position.x = THREE.MathUtils.lerp(ref.current.position.x, position[0], delta * 10)
+      ref.current.position.z = THREE.MathUtils.lerp(ref.current.position.z, position[2], delta * 10)
+      
+      if (!isTakingOff) {
         const time = state.clock.elapsedTime
         ref.current.position.y += Math.sin(time * 3) * 0.005
         ref.current.rotation.z = Math.sin(time * 1.5) * 0.1
@@ -39,25 +178,22 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
 
   return (
     <group ref={ref} {...props}>
-      <primitive object={scene} />
+      <primitive object={fbx} />
       {(isTakingOff && !inSpace) && (
-        <group>
-          <FireTrail position={[0.14, -0.16, 0.05]} active={isTakingOff} />
-          <FireTrail position={[-0.14, -0.16, 0.05]} active={isTakingOff} />
-        </group>
-      )}
-    </group>
-  )
+      <group>
+        <FireTrail position={[0.14, -0.16, 0.05]} active={isTakingOff} />
+        <FireTrail position={[-0.14, -0.16, 0.05]} active={isTakingOff} />
+      </group>
+    )}
+  </group>
+)
 }
 
 function FireTrail({ position, active }: { position: [number, number, number], active: boolean }) {
   const ref = useRef<THREE.Group>(null);
-
   useFrame((state, delta) => {
     if (!ref.current) return;
     ref.current.rotation.y += delta * 6;
-
-    // Intense flickering rocket plume animation
     if (active) {
       const flicker = 1.0 + Math.sin(state.clock.elapsedTime * 45) * 0.25;
       ref.current.scale.set(flicker * 1.4, flicker * 2.8, flicker * 1.4);
@@ -65,22 +201,16 @@ function FireTrail({ position, active }: { position: [number, number, number], a
       ref.current.scale.set(0.01, 0.01, 0.01);
     }
   });
-
   return (
     <group ref={ref} position={position}>
-      {/* Outer orange flame cone */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.09, 0.38, 12]} />
         <meshStandardMaterial emissive="#ff4500" color="#f97316" transparent opacity={active ? 0.95 : 0} />
       </mesh>
-
-      {/* Inner yellow hot core */}
       <mesh position={[0, -0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.05, 0.24, 10]} />
         <meshStandardMaterial emissive="#ffea00" color="#facc15" transparent opacity={active ? 0.98 : 0} />
       </mesh>
-
-      {/* Small blue base flame for realism */}
       <mesh position={[0, 0.08, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.06, 0.04, 0.08, 8]} />
         <meshStandardMaterial emissive="#00d2ff" color="#38bdf8" transparent opacity={active ? 0.9 : 0} />

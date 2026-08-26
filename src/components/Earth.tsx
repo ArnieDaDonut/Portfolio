@@ -10,7 +10,7 @@ export function Earth({ label, ...props }: any) {
   const clonedScene = useMemo(() => scene.clone(), [scene])
   const ref = useRef<THREE.Group>(null)
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (ref.current) {
       ref.current.rotation.y += delta * 0.05
     }

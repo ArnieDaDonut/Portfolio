@@ -107,3 +107,62 @@ canvas {
   color: black;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
 }
+
+.planet-ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4rem 2rem;
+  box-sizing: border-box;
+}
+
+.planet-title {
+  font-family: 'Press Start 2P', monospace;
+  color: white;
+  font-size: 2.5rem;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
+}
+
+.planet-card {
+  pointer-events: auto;
+  background: rgba(15, 23, 42, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  color: white;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+.return-orbit-btn {
+  pointer-events: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.9rem;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid white;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.return-orbit-btn:hover {
+  background: white;
+  color: black;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+}
