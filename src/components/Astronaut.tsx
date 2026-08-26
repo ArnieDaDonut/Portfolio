@@ -3,9 +3,9 @@ import { useRef, useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace = false, astroRef, ...props }: any) {
+export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace = false, onPlanet = false, astroRef, ...props }: any) {
   const fbx = useFBX('/animations/astronaut.fbx')
-  
+
   // Load all animations
   const idleFbx = useFBX('/animations/idle.fbx')
   const walkFbx = useFBX('/animations/walking.fbx')
@@ -37,7 +37,7 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
             const startZ = values[2];
             for (let i = 0; i < values.length; i += 3) {
               values[i] = startX;     // Lock X position to start
-              values[i+2] = startZ;   // Lock Z position to start
+              values[i + 2] = startZ;   // Lock Z position to start
             }
           }
         })
@@ -61,7 +61,7 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
 
   // Setup keyboard listeners
   useEffect(() => {
-    if (!inSpace) return;
+    if (!onPlanet) return;
     const handleKeyDown = (e: KeyboardEvent) => { keys.current[e.code] = true; keys.current[e.key.toLowerCase()] = true; }
     const handleKeyUp = (e: KeyboardEvent) => { keys.current[e.code] = false; keys.current[e.key.toLowerCase()] = false; }
     window.addEventListener('keydown', handleKeyDown)
@@ -70,7 +70,7 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [inSpace])
+  }, [onPlanet])
 
   useEffect(() => {
     if (ref.current) {
@@ -89,10 +89,10 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
   useFrame((state, delta) => {
     if (!ref.current) return;
 
-    if (inSpace) {
+    if (onPlanet) {
       const moveSpeed = 8 * delta;
       const turnSpeed = 3 * delta;
-      
+
       let isMoving = false;
       let nextAnim = 'Idle';
 
@@ -104,57 +104,54 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
       }
 
       if (!isJumping.current) {
-        // Forward / Backward
-        if (keys.current['KeyW'] || keys.current['ArrowUp'] || keys.current['w']) {
-          ref.current.translateZ(moveSpeed);
+        let dx = 0;
+        let dz = 0;
+
+        if (keys.current['KeyW'] || keys.current['ArrowUp'] || keys.current['w']) dz -= 1;
+        if (keys.current['KeyS'] || keys.current['ArrowDown'] || keys.current['s']) dz += 1;
+        if (keys.current['KeyA'] || keys.current['ArrowLeft'] || keys.current['a']) dx -= 1;
+        if (keys.current['KeyD'] || keys.current['ArrowRight'] || keys.current['d']) dx += 1;
+
+
+        if (dx !== 0 || dz !== 0) {
           isMoving = true;
           nextAnim = 'Walk';
-        }
-        if (keys.current['KeyS'] || keys.current['ArrowDown'] || keys.current['s']) {
-          ref.current.translateZ(-moveSpeed * 0.5); // Walk backward slower
-          isMoving = true;
-          nextAnim = 'Walk'; // Optionally add a walk backward animation here
-        }
 
-        // Turning
-        if (keys.current['KeyA'] || keys.current['ArrowLeft'] || keys.current['a']) {
-          ref.current.rotation.y += turnSpeed;
-          if (!isMoving) nextAnim = 'TurnLeft';
-        }
-        if (keys.current['KeyD'] || keys.current['ArrowRight'] || keys.current['d']) {
-          ref.current.rotation.y -= turnSpeed;
-          if (!isMoving) nextAnim = 'TurnRight';
-        }
+          const targetAngle = Math.atan2(dx, dz);
+          const targetRotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, targetAngle, 0));
 
-        // Strafing (Q and E)
-        if (keys.current['KeyQ'] || keys.current['q']) {
-          ref.current.translateX(moveSpeed * 0.8);
-          isMoving = true;
-          nextAnim = 'StrafeLeft';
-        }
-        if (keys.current['KeyE'] || keys.current['e']) {
-          ref.current.translateX(-moveSpeed * 0.8);
-          isMoving = true;
-          nextAnim = 'StrafeRight';
-        }
+          ref.current.quaternion.slerp(targetRotation, 10 * delta);
 
+          const moveDir = new THREE.Vector3(dx, 0, dz).normalize();
+          ref.current.position.add(moveDir.multiplyScalar(moveSpeed));
+        }
         playAnim(nextAnim);
       }
 
-      // CAMERA FOLLOW LOGIC (True Third Person)
+      // CAMERA FOLLOW LOGIC (Fixed Chase Camera)
+      // By keeping the camera fixed globally, WASD will always perfectly match the screen directions!
       const x = ref.current.position.x;
       const y = ref.current.position.y;
       const z = ref.current.position.z;
 
-      const offset = new THREE.Vector3(0, 4, -12); // Negative Z to be behind the character (assuming character faces +Z)
-      offset.applyQuaternion(ref.current.quaternion);
-      
-      const targetCameraPos = new THREE.Vector3(x, y, z).add(offset);
+      const targetCameraPos = new THREE.Vector3(x, y + 6, z + 8);
       state.camera.position.lerp(targetCameraPos, 0.1);
-      
-      const lookAtTarget = new THREE.Vector3(x, y + 3, z);
+
+      const lookAtTarget = new THREE.Vector3(x, y + 4, z);
       state.camera.lookAt(lookAtTarget);
 
+    } else if (inSpace) {
+      ref.current.position.lerp(new THREE.Vector3(position[0], 20, position[2]), 0.15);
+
+      const time = state.clock.elapsedTime;
+
+      ref.current.position.y += Math.sin(time * 3) * 0.005;
+      ref.current.rotation.z = Math.sin(time * 1.5) * 0.1;
+      ref.current.rotation.x = Math.cos(time * 1.2) * 0.05;
+
+      ref.current.rotation.y = THREE.MathUtils.lerp(ref.current.rotation.y, 0, delta * 2);
+
+      playAnim('Idle');
     } else {
       // HOMEPAGE LOGIC
       const targetY = isTakingOff ? 20 : position[1]
@@ -162,7 +159,7 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
       ref.current.position.y = THREE.MathUtils.lerp(ref.current.position.y, targetY, delta * speed)
       ref.current.position.x = THREE.MathUtils.lerp(ref.current.position.x, position[0], delta * 10)
       ref.current.position.z = THREE.MathUtils.lerp(ref.current.position.z, position[2], delta * 10)
-      
+
       if (!isTakingOff) {
         const time = state.clock.elapsedTime
         ref.current.position.y += Math.sin(time * 3) * 0.005
@@ -180,13 +177,13 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
     <group ref={ref} {...props}>
       <primitive object={fbx} />
       {(isTakingOff && !inSpace) && (
-      <group>
-        <FireTrail position={[0.14, -0.16, 0.05]} active={isTakingOff} />
-        <FireTrail position={[-0.14, -0.16, 0.05]} active={isTakingOff} />
-      </group>
-    )}
-  </group>
-)
+        <group>
+          <FireTrail position={[0.14, -0.16, 0.05]} active={isTakingOff} />
+          <FireTrail position={[-0.14, -0.16, 0.05]} active={isTakingOff} />
+        </group>
+      )}
+    </group>
+  )
 }
 
 function FireTrail({ position, active }: { position: [number, number, number], active: boolean }) {

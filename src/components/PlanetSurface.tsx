@@ -49,7 +49,7 @@ export function PlanetSurface({ planetName }: SurfaceProps) {
 
             <InfoPoint position={[infoPointPos.x, infoPointPos.y, infoPointPos.z]} label={planetName} showInfo={showInfo} />
 
-            <Astronaut astroRef={astroRef} position={[0, 0.2, 0]} scale={2.5} inSpace={true} />
+            <Astronaut astroRef={astroRef} position={[0, 0.2, 0]} scale={2.5} onPlanet={true} />
         </group>
     );
 }
