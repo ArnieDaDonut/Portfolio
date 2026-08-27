@@ -32,10 +32,10 @@ export function Planet({ modelPath, position, label, onClick, targetSize = 3.5, 
   return (
     <group position={position}>
       {label && (
-        <Html 
-          position={[0, targetSize / 2 + 1, 0]} 
-          center 
-          zIndexRange={[100, 0]} 
+        <Html
+          position={[0, targetSize / 2 + 1, 0]}
+          center
+          zIndexRange={[100, 0]}
         >
           <div
             style={{
@@ -54,18 +54,21 @@ export function Planet({ modelPath, position, label, onClick, targetSize = 3.5, 
           </div>
         </Html>
       )}
-      <primitive
-        ref={ref}
-        object={clonedScene}
-        onPointerOver={() => {
-          setHover(true)
-          document.body.style.cursor = 'pointer'
-        }}
+      <mesh onPointerOver={() => {
+        setHover(true)
+        document.body.style.cursor = 'pointer'
+      }}
         onPointerOut={() => {
           setHover(false)
           document.body.style.cursor = 'auto'
         }}
-        onClick={onClick}
+        onClick={onClick}>
+        <sphereGeometry args={[targetSize / 2 * 1.2, 16, 16]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+      <primitive
+        ref={ref}
+        object={clonedScene}
         {...props}
       />
     </group>

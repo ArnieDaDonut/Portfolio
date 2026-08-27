@@ -2,8 +2,10 @@ import { useFBX, useAnimations } from '@react-three/drei'
 import { useRef, useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { getTerrainHeight } from '../utils/terrain';
+import { add } from 'three/src/nodes/math/OperatorNode.js';
 
-export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace = false, onPlanet = false, astroRef, ...props }: any) {
+export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace = false, onPlanet = false, planetName = "", astroRef, controlsRef, ...props }: any) {
   const fbx = useFBX('/animations/astronaut.fbx')
 
   // Load all animations
@@ -117,28 +119,48 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
           isMoving = true;
           nextAnim = 'Walk';
 
-          const targetAngle = Math.atan2(dx, dz);
-          const targetRotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, targetAngle, 0));
+          const forward = new THREE.Vector3();
+          state.camera.getWorldDirection(forward);
+          forward.y = 0;
+          forward.normalize();
 
+          const right = new THREE.Vector3();
+          right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+
+          const moveDir = new THREE.Vector3()
+            .addScaledVector(right, dx)
+            .addScaledVector(forward, -dz)
+            .normalize();
+
+          const targetAngle = Math.atan2(moveDir.x, moveDir.z);
+          const targetRotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, targetAngle, 0));
           ref.current.quaternion.slerp(targetRotation, 10 * delta);
 
-          const moveDir = new THREE.Vector3(dx, 0, dz).normalize();
           ref.current.position.add(moveDir.multiplyScalar(moveSpeed));
+          const terrainY = getTerrainHeight(ref.current.position.x, -ref.current.position.z, planetName);
+
+          ref.current.position.y = terrainY + 0.2;
         }
         playAnim(nextAnim);
       }
 
-      // CAMERA FOLLOW LOGIC (Fixed Chase Camera)
-      // By keeping the camera fixed globally, WASD will always perfectly match the screen directions!
-      const x = ref.current.position.x;
-      const y = ref.current.position.y;
-      const z = ref.current.position.z;
+      // CAMERA FOLLOW LOGIC (360° Orbit & Follow)
+      if (controlsRef?.current?.target) {
+        const controls = controlsRef.current;
+        const targetX = ref.current.position.x;
+        const targetY = ref.current.position.y + 2;
+        const targetZ = ref.current.position.z;
 
-      const targetCameraPos = new THREE.Vector3(x, y + 6, z + 8);
-      state.camera.position.lerp(targetCameraPos, 0.1);
+        const diffX = targetX - controls.target.x;
+        const diffY = targetY - controls.target.y;
+        const diffZ = targetZ - controls.target.z;
 
-      const lookAtTarget = new THREE.Vector3(x, y + 4, z);
-      state.camera.lookAt(lookAtTarget);
+        controls.target.set(targetX, targetY, targetZ);
+        state.camera.position.x += diffX;
+        state.camera.position.y += diffY;
+        state.camera.position.z += diffZ;
+        controls.update();
+      }
 
     } else if (inSpace) {
       ref.current.position.lerp(new THREE.Vector3(position[0], 20, position[2]), 0.15);
