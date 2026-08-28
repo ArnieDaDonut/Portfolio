@@ -3,7 +3,7 @@ import { useRef, useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { getTerrainHeight } from '../utils/terrain';
-import { add } from 'three/src/nodes/math/OperatorNode.js';
+
 
 export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace = false, onPlanet = false, planetName = "", astroRef, controlsRef, ...props }: any) {
   const fbx = useFBX('/animations/astronaut.fbx')
@@ -16,6 +16,8 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
   const rightStrafeFbx = useFBX('/animations/right strafe walking.fbx')
   const leftTurnFbx = useFBX('/animations/left turn 90.fbx')
   const rightTurnFbx = useFBX('/animations/right turn 90.fbx')
+  const floatingFbx = useFBX('/animations/Floating.fbx')
+  const swimmingFbx = useFBX('/animations/Swimming.fbx')
 
   const internalRef = useRef<THREE.Group>(null)
   const ref = astroRef || internalRef
@@ -55,9 +57,12 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
     addAnim(rightStrafeFbx, "StrafeRight")
     addAnim(leftTurnFbx, "TurnLeft")
     addAnim(rightTurnFbx, "TurnRight")
+    addAnim(floatingFbx, "Floating")
+    addAnim(swimmingFbx, "Swimming")
+
 
     return clips;
-  }, [idleFbx, walkFbx, jumpFbx, leftStrafeFbx, rightStrafeFbx, leftTurnFbx, rightTurnFbx])
+  }, [idleFbx, walkFbx, jumpFbx, leftStrafeFbx, rightStrafeFbx, leftTurnFbx, rightTurnFbx, floatingFbx, swimmingFbx])
 
   const { actions } = useAnimations(anims, ref)
 
@@ -98,8 +103,8 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
       let isMoving = false;
       let nextAnim = 'Idle';
 
-      // Jump Logic
-      if (keys.current['Space'] && !isJumping.current) {
+      // Jump Logic (only on solid planets)
+      if (planetName !== 'Contact' && keys.current['Space'] && !isJumping.current) {
         isJumping.current = true;
         playAnim('Jump');
         setTimeout(() => { isJumping.current = false; }, 1000); // Reset jump after 1s
@@ -108,39 +113,76 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
       if (!isJumping.current) {
         let dx = 0;
         let dz = 0;
+        let dy = 0;
 
         if (keys.current['KeyW'] || keys.current['ArrowUp'] || keys.current['w']) dz -= 1;
         if (keys.current['KeyS'] || keys.current['ArrowDown'] || keys.current['s']) dz += 1;
         if (keys.current['KeyA'] || keys.current['ArrowLeft'] || keys.current['a']) dx -= 1;
         if (keys.current['KeyD'] || keys.current['ArrowRight'] || keys.current['d']) dx += 1;
 
+        if (planetName === 'Contact') {
+          nextAnim = 'Floating';
 
-        if (dx !== 0 || dz !== 0) {
-          isMoving = true;
-          nextAnim = 'Walk';
+          if (keys.current['Space']) dy += 1;
+          if (keys.current['ShiftLeft'] || keys.current['ShiftRight'] || keys.current['KeyE']) dy -= 1;
 
-          const forward = new THREE.Vector3();
-          state.camera.getWorldDirection(forward);
-          forward.y = 0;
-          forward.normalize();
+          if (dx !== 0 || dz !== 0 || dy !== 0) {
+            isMoving = true;
+            nextAnim = 'Swimming';
 
-          const right = new THREE.Vector3();
-          right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+            const forward = new THREE.Vector3();
+            state.camera.getWorldDirection(forward);
+            forward.normalize();
 
-          const moveDir = new THREE.Vector3()
-            .addScaledVector(right, dx)
-            .addScaledVector(forward, -dz)
-            .normalize();
+            const right = new THREE.Vector3();
+            right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
 
-          const targetAngle = Math.atan2(moveDir.x, moveDir.z);
-          const targetRotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, targetAngle, 0));
-          ref.current.quaternion.slerp(targetRotation, 10 * delta);
+            const up = new THREE.Vector3(0, 1, 0);
 
-          ref.current.position.add(moveDir.multiplyScalar(moveSpeed));
-          const terrainY = getTerrainHeight(ref.current.position.x, -ref.current.position.z, planetName);
+            const moveDir = new THREE.Vector3()
+              .addScaledVector(right, dx)
+              .addScaledVector(forward, -dz)
+              .addScaledVector(up, dy)
+              .normalize();
 
-          ref.current.position.y = terrainY + 0.2;
+            const targetAngle = Math.atan2(moveDir.x, moveDir.z);
+            const targetRotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, targetAngle, 0));
+            ref.current.quaternion.slerp(targetRotation, 8 * delta);
+
+            ref.current.position.add(moveDir.multiplyScalar(moveSpeed));
+          }
+
+          ref.current.position.y += Math.sin(state.clock.elapsedTime * 1.5) * 0.003;
+        } else {
+
+          if (dx !== 0 || dz !== 0) {
+            isMoving = true;
+            nextAnim = 'Walk';
+
+            const forward = new THREE.Vector3();
+            state.camera.getWorldDirection(forward);
+            forward.y = 0;
+            forward.normalize();
+
+            const right = new THREE.Vector3();
+            right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+
+            const moveDir = new THREE.Vector3()
+              .addScaledVector(right, dx)
+              .addScaledVector(forward, -dz)
+              .normalize();
+
+            const targetAngle = Math.atan2(moveDir.x, moveDir.z);
+            const targetRotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, targetAngle, 0));
+            ref.current.quaternion.slerp(targetRotation, 10 * delta);
+
+            ref.current.position.add(moveDir.multiplyScalar(moveSpeed));
+            const terrainY = getTerrainHeight(ref.current.position.x, -ref.current.position.z, planetName);
+
+            ref.current.position.y = terrainY + 0.2;
+          }
         }
+
         playAnim(nextAnim);
       }
 

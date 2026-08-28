@@ -1,6 +1,6 @@
 import { Suspense, useState, useEffect, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Sparkles, Environment, OrbitControls } from '@react-three/drei'
+import { Stars, Environment, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { PlanetSurface } from './components/PlanetSurface';
 import { PlanetUI } from './components/PlanetUI';
@@ -123,15 +123,16 @@ export default function App() {
       )}
 
       <Canvas camera={{ position: [0, 2, 10], fov: 45 }}>
-        <color attach="background" args={['#0f1a30']} />
+        <color attach="background" args={[activePlanet === 'Contact' ? '#000000' : '#0f1a30']} />
 
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1.5} />
+        <ambientLight intensity={activePlanet === 'Contact' ? 0.2 : 0.5} />
+        {activePlanet !== 'Contact' && <directionalLight position={[10, 10, 5]} intensity={1.5} />}
 
-        <Sparkles position={[0, 10, 0]} count={5000} scale={50} size={5} speed={0.4} />
-
+        {activePlanet !== 'Contact' && (
+          <Stars radius={100} depth={50} count={10000} factor={4} saturation={0} fade speed={1} />
+        )}
         <Suspense fallback={null}>
-          <Environment preset="night" />
+          {activePlanet !== 'Contact' && <Environment preset="night" />}
 
           {!inSpace && <Earth position={[0, -1.5, 0]} scale={0.015} />}
 
