@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { getTerrainHeight } from '../utils/terrain';
 import { BlackHole } from './BlackHole';
+import { SkillsStations } from './SkillsStations';
 
 interface SurfaceProps {
     planetName: string;
@@ -147,6 +148,8 @@ export function PlanetSurface({ planetName, controlsRef }: { planetName: string,
             ) : (
                 <BlackHole position={[0, 1, -12]} scale={3} />
             )}
+
+            {planetName === 'Skills' && <SkillsStations />}
 
             <InfoPoint position={[infoPointPos.x, infoY, infoPointPos.z]} label={planetName} showInfo={showInfo} />
 
