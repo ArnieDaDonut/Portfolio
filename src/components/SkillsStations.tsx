@@ -270,6 +270,154 @@ function TimeManagementHolo() {
     );
 }
 
+
+function AdaptabilityHolo() {
+    const groupRef = useRef<THREE.Group>(null);
+    const coreRef1 = useRef<THREE.Mesh>(null);
+    const coreRef2 = useRef<THREE.Mesh>(null);
+    const ring1Ref = useRef<THREE.Mesh>(null);
+    const ring2Ref = useRef<THREE.Mesh>(null);
+    const ring3Ref = useRef<THREE.Mesh>(null);
+    const orbitGroupRef = useRef<THREE.Group>(null);
+    const nodesRef = useRef<THREE.Mesh[]>([]);
+
+    useFrame((state) => {
+        const t = state.clock.elapsedTime;
+
+        // Dynamic Continuous Color Morphing (Chameleon Effect)
+        const hue = (t * 0.15) % 1.0;
+        const colorPrimary = new THREE.Color().setHSL(hue, 0.95, 0.6);
+        const colorSecondary = new THREE.Color().setHSL((hue + 0.33) % 1.0, 0.95, 0.55);
+        const colorTertiary = new THREE.Color().setHSL((hue + 0.66) % 1.0, 0.95, 0.65);
+
+        // Core 1: Morphing / Breathing Icosahedron Shell
+        if (coreRef1.current) {
+            const scale = 1.0 + Math.sin(t * 2.5) * 0.25;
+            coreRef1.current.scale.set(scale, scale, scale);
+            coreRef1.current.rotation.x = t * 0.9;
+            coreRef1.current.rotation.y = t * 1.3;
+            coreRef1.current.rotation.z = Math.sin(t * 1.5) * 0.5;
+            (coreRef1.current.material as THREE.MeshBasicMaterial).color = colorPrimary;
+        }
+
+        // Core 2: Counter-Rotating Inner Octahedron
+        if (coreRef2.current) {
+            const scale2 = 0.7 + Math.cos(t * 3.0) * 0.2;
+            coreRef2.current.scale.set(scale2, scale2, scale2);
+            coreRef2.current.rotation.x = -t * 1.2;
+            coreRef2.current.rotation.y = -t * 0.8;
+            (coreRef2.current.material as THREE.MeshBasicMaterial).color = colorSecondary;
+        }
+
+        // Gyroscopic Adaptive Quantum Rings
+        if (ring1Ref.current) {
+            ring1Ref.current.rotation.x = t * 1.1;
+            ring1Ref.current.rotation.y = t * 0.5;
+            (ring1Ref.current.material as THREE.MeshBasicMaterial).color = colorPrimary;
+        }
+        if (ring2Ref.current) {
+            ring2Ref.current.rotation.y = -t * 1.4;
+            ring2Ref.current.rotation.z = t * 0.7;
+            (ring2Ref.current.material as THREE.MeshBasicMaterial).color = colorSecondary;
+        }
+        if (ring3Ref.current) {
+            ring3Ref.current.rotation.x = Math.sin(t * 1.8) * Math.PI;
+            ring3Ref.current.rotation.z = -t * 1.0;
+            (ring3Ref.current.material as THREE.MeshBasicMaterial).color = colorTertiary;
+        }
+
+        // Orbiting Adaptable Nodes (Changing Radius & Wave Oscillations)
+        if (orbitGroupRef.current) {
+            orbitGroupRef.current.rotation.y = t * 0.8;
+        }
+
+        nodesRef.current.forEach((node, i) => {
+            if (node) {
+                const angle = (i / 6) * Math.PI * 2 + t * 0.5;
+                const radius = 1.8 + Math.sin(t * 2.0 + i) * 0.4;
+                const height = Math.cos(t * 2.5 + i * 1.5) * 0.6;
+                node.position.set(Math.cos(angle) * radius, height, Math.sin(angle) * radius);
+                node.rotation.x = t * 2 + i;
+                node.rotation.y = t * 3 + i;
+                (node.material as THREE.MeshBasicMaterial).color = (i % 2 === 0) ? colorPrimary : colorSecondary;
+            }
+        });
+
+        // Hologram Base Floating & Pulsing
+        if (groupRef.current) {
+            groupRef.current.position.y = 2.4 + Math.sin(t * 1.8) * 0.15;
+        }
+    });
+
+    return (
+        <group position={[0, 0, 0]}>
+            {/* Hologram Projector Pedestal */}
+            <mesh position={[0, 0.1, 0]}>
+                <cylinderGeometry args={[1.6, 1.9, 0.25, 24]} />
+                <meshStandardMaterial color="#0f172a" metalness={0.9} roughness={0.2} />
+            </mesh>
+            <mesh position={[0, 0.25, 0]}>
+                <cylinderGeometry args={[1.3, 1.3, 0.08, 24]} />
+                <meshBasicMaterial color="#a855f7" />
+            </mesh>
+
+            {/* Upward Holographic Emitter Light Cone */}
+            <mesh position={[0, 1.25, 0]}>
+                <cylinderGeometry args={[1.4, 0.5, 2.2, 16, 1, true]} />
+                <meshBasicMaterial color="#c084fc" wireframe transparent opacity={0.12} side={THREE.DoubleSide} />
+            </mesh>
+
+            {/* Main Shapeshifting Hologram Floating Group */}
+            <group ref={groupRef} position={[0, 2.4, 0]}>
+                {/* Outer Morphing Shell (Icosahedron) */}
+                <mesh ref={coreRef1}>
+                    <icosahedronGeometry args={[1.1, 0]} />
+                    <meshBasicMaterial wireframe transparent opacity={0.75} />
+                </mesh>
+
+                {/* Inner Morphing Core (Octahedron) */}
+                <mesh ref={coreRef2}>
+                    <octahedronGeometry args={[0.7, 0]} />
+                    <meshBasicMaterial wireframe transparent opacity={0.9} />
+                </mesh>
+
+                {/* Center Glowing Energy Orb */}
+                <mesh>
+                    <sphereGeometry args={[0.3, 16, 16]} />
+                    <meshBasicMaterial color="#ffffff" />
+                </mesh>
+
+                {/* Gyroscopic Adaptive Quantum Rings */}
+                <mesh ref={ring1Ref}>
+                    <torusGeometry args={[1.5, 0.035, 16, 64]} />
+                    <meshBasicMaterial transparent opacity={0.85} />
+                </mesh>
+                <mesh ref={ring2Ref} rotation={[Math.PI / 3, 0, 0]}>
+                    <torusGeometry args={[1.7, 0.03, 16, 64]} />
+                    <meshBasicMaterial transparent opacity={0.75} />
+                </mesh>
+                <mesh ref={ring3Ref} rotation={[0, Math.PI / 4, Math.PI / 3]}>
+                    <torusGeometry args={[1.9, 0.025, 16, 64]} />
+                    <meshBasicMaterial transparent opacity={0.65} />
+                </mesh>
+
+                {/* Orbiting Quantum Data Nodes */}
+                <group ref={orbitGroupRef}>
+                    {[...Array(6)].map((_, i) => (
+                        <mesh
+                            key={i}
+                            ref={(el) => { if (el) nodesRef.current[i] = el; }}
+                        >
+                            <dodecahedronGeometry args={[0.16, 0]} />
+                            <meshBasicMaterial wireframe />
+                        </mesh>
+                    ))}
+                </group>
+            </group>
+        </group>
+    );
+}
+
 function QuickLearningHolo() {
     const atomRef = useRef<THREE.Group>(null);
     useFrame((_, delta) => {
@@ -410,19 +558,21 @@ function MountainsRing() {
     const mountains = useMemo(() => {
         const arr = [];
         const numMountains = 120;
-        const radius = 250;
+        const radiusX = 220;
+        const radiusZ = 220;
+        const centerZ = -110;
 
         for (let i = 0; i < numMountains; i++) {
             const angle = (i / numMountains) * Math.PI * 2;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius - 100;
+            const x = Math.cos(angle) * radiusX;
+            const z = Math.sin(angle) * radiusZ + centerZ;
 
-            const rx = x + (Math.random() - 0.5) * 30;
-            const rz = z + (Math.random() - 0.5) * 30;
+            const rx = x + (Math.random() - 0.5) * 25;
+            const rz = z + (Math.random() - 0.5) * 25;
             const y = getTerrainHeight(rx, -rz, 'Skills') - 2;
 
-            const sY = 30 + Math.random() * 40;
-            const sXZ = 20 + Math.random() * 20;
+            const sY = 35 + Math.random() * 40;
+            const sXZ = 24 + Math.random() * 20;
 
             const rotY = Math.random() * Math.PI * 2;
             const rotX = (Math.random() - 0.5) * 0.3;
@@ -430,6 +580,7 @@ function MountainsRing() {
 
             arr.push({ x: rx, y, z: rz, sY, sXZ, rotX, rotY, rotZ });
         }
+
         return arr;
     }, []);
 
@@ -449,8 +600,7 @@ function Path() {
     const pathStones = useMemo(() => {
         const points = [
             new THREE.Vector3(0, 0, -2),
-            new THREE.Vector3(10, 0, -10),
-            new THREE.Vector3(-10, 0, -20),
+            new THREE.Vector3(-10, 0, -15),
             new THREE.Vector3(-25, 0, -35),
             new THREE.Vector3(-10, 0, -50),
             new THREE.Vector3(10, 0, -65),
@@ -458,13 +608,13 @@ function Path() {
             new THREE.Vector3(20, 0, -95),
             new THREE.Vector3(0, 0, -110),
             new THREE.Vector3(-20, 0, -130),
-            new THREE.Vector3(0, 0, -145),
-            new THREE.Vector3(15, 0, -155),
+            new THREE.Vector3(-20, 0, -160),
+            new THREE.Vector3(0, 0, -165),
             new THREE.Vector3(25, 0, -170),
             new THREE.Vector3(10, 0, -185),
             new THREE.Vector3(-5, 0, -200),
             new THREE.Vector3(-15, 0, -215),
-            new THREE.Vector3(-5, 0, -230),
+            new THREE.Vector3(25, 0, -230),
             new THREE.Vector3(0, 0, -245),
         ];
 
@@ -479,7 +629,7 @@ function Path() {
 
             const x = pt.x;
             const z = pt.z;
-            const y = getTerrainHeight(x, -z, 'Skills') + 0.1;
+            const y = getTerrainHeight(x, -z, 'Skills') + 0.22;
 
             const rotY = Math.atan2(tangent.x, tangent.z);
 
@@ -494,7 +644,7 @@ function Path() {
         return stones;
     }, []);
 
-    const pathGeo = useMemo(() => new THREE.BoxGeometry(3.0, 0.1, 1.2), []);
+    const pathGeo = useMemo(() => new THREE.BoxGeometry(3.0, 0.2, 1.2), []);
     const pathMat = useMemo(() => new THREE.MeshStandardMaterial({ color: "#d8b4fe", emissive: "#a855f7", emissiveIntensity: 0.6, transparent: true, opacity: 0.8 }), []);
 
     return (
@@ -511,6 +661,7 @@ export function SkillsStations() {
     const chairGltf = useGLTF('/chair.glb');
     const computerGltf = useGLTF('/computer.glb');
     const paperGltf = useGLTF('/paper.glb');
+    const robotGltf = useGLTF('/Robot.glb');
 
     const teamPos = { x: -25, z: -35 };
     const teamY = getTerrainHeight(teamPos.x, -teamPos.z, 'Skills') + 1.5;
@@ -529,6 +680,12 @@ export function SkillsStations() {
 
     const towerPos = { x: 0, z: -245 };
     const towerY = getTerrainHeight(towerPos.x, -towerPos.z, 'Skills') + 0.2;
+
+    const adaptPos = { x: -20, z: -160 };
+    const adaptY = getTerrainHeight(adaptPos.x, -adaptPos.z, 'Skills') + 1.2;
+
+    const robotPos = { x: 25, z: -230 };
+    const robotY = getTerrainHeight(robotPos.x, -robotPos.z, 'Skills') + 0.35;
 
     const talkPool = [
         '/animations/Talking.fbx',
@@ -571,7 +728,7 @@ export function SkillsStations() {
 
             <LightBeacon position={[-5, getTerrainHeight(-5, 230, 'Skills') + 0.1, -230]} color="#00e5ff" />
 
-            {/* 1. Teamwork Station */}
+            {/* Teamwork Station */}
             <group position={[teamPos.x, teamY, teamPos.z]}>
                 <StationPad radius={4.8} color="#a855f7" />
                 <HoloProjector />
@@ -595,7 +752,7 @@ export function SkillsStations() {
                 />
             </group>
 
-            {/* 2. Programmer Station */}
+            {/* Programmer Station */}
             <group position={[codePos.x, codeY, codePos.z]} rotation={[0, -Math.PI / 6, 0]}>
                 <StationPad radius={4.4} color="#00e5ff" />
 
@@ -617,7 +774,7 @@ export function SkillsStations() {
                 />
             </group>
 
-            {/* 3. Problem-Solving Station */}
+            {/* Problem-Solving Station */}
             <group position={[writePos.x, writeY, writePos.z]} rotation={[0, 0, 0]}>
                 <StationPad radius={4.4} color="#fbbf24" />
 
@@ -638,7 +795,7 @@ export function SkillsStations() {
                 />
             </group>
 
-            {/* 4. Time Management Station */}
+            {/* Time Management Station */}
             <group position={[timePos.x, timeY, timePos.z]} rotation={[0, -Math.PI / 4, 0]}>
                 <StationPad radius={4.4} color="#00e5ff" />
                 <TimeManagementHolo />
@@ -649,14 +806,15 @@ export function SkillsStations() {
                 <TechCrate position={[2.4, 0.3, 0.5]} rotation={[0, 0.4, 0]} scale={1.1} color="#00e5ff" />
                 <TechCrate position={[2.5, 1.1, 0.4]} rotation={[0, -0.2, 0]} scale={0.9} color="#38bdf8" />
 
+                <AutoScaledModel scene={chairGltf.scene} targetHeight={3.6} position={[1.8, 0.3, -1.8]} rotation={[0, -Math.PI / 3, 0]} />
                 <StationAstronaut
                     animPaths="/animations/Typing.fbx"
-                    position={[1.8, 0.3, -1.8]}
+                    position={[1.8, 0.4, -1.8]}
                     rotation={[0, -Math.PI / 3, 0]}
                 />
             </group>
 
-            {/* 5. Quick Learning Station */}
+            {/* Quick Learning Station */}
             <group position={[learnPos.x, learnY, learnPos.z]} rotation={[0, Math.PI / 6, 0]}>
                 <StationPad radius={4.4} color="#fbbf24" />
                 <QuickLearningHolo />
@@ -671,6 +829,35 @@ export function SkillsStations() {
                     animPaths="/animations/Writing.fbx"
                     position={[-2.0, 0.4, -1.8]}
                     rotation={[0, Math.PI / 4, 0]}
+                />
+            </group>
+
+            <group position={[adaptPos.x, adaptY, adaptPos.z]} rotation={[0, -Math.PI / 4, 0]}>
+                <StationPad radius={4.0} color="#d8b4fe" />
+                <StationText text="Adaptability" position={[0, 6.0, 0]} />
+
+                <AdaptabilityHolo />
+
+                <StationAstronaut
+                    animPaths={talkPool}
+                    position={[0, 0.3, -2]}
+                    rotation={[0, 0, 0]}
+                />
+            </group>
+
+            <group position={[robotPos.x, robotY, robotPos.z]} rotation={[0, -Math.PI / 5, 0]}>
+                <StationPad radius={4.5} color="#00e5ff" />
+                <StationText text="Robotics & Hardware" position={[0, 6.5, 0]} />
+
+                <TechCrate position={[-2.5, 0.3, 0]} rotation={[0, 0.5, 0]} scale={1.2} color="#fbbf24" />
+
+                <AutoScaledModel scene={robotGltf.scene} targetHeight={2.5} position={[0, 0.3, 0]} rotation={[0, Math.PI / 4, 0]} />
+
+                <AutoScaledModel scene={chairGltf.scene} targetHeight={3.6} position={[0, 0.3, -2.5]} rotation={[0, 0, 0]} />
+                <StationAstronaut
+                    animPaths="/animations/Writing.fbx"
+                    position={[0, 0.4, -2.5]}
+                    rotation={[0, 0, 0]}
                 />
             </group>
         </group>

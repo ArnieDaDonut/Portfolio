@@ -83,9 +83,10 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
 
   useEffect(() => {
     if (ref.current) {
-      ref.current.position.set(position[0], inSpace ? 0.2 : -10, position[2])
+      const startY = onPlanet ? getTerrainHeight(position[0], -position[2], planetName) + 0.35 : (inSpace ? 0.2 : -10);
+      ref.current.position.set(position[0], startY, position[2]);
     }
-  }, [])
+  }, [onPlanet, planetName, position, inSpace]);
 
   const playAnim = (name: string) => {
     if (currentAction.current !== name && actions[name]) {
@@ -182,7 +183,7 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
             ref.current.position.add(moveDir.multiplyScalar(moveSpeed));
             const terrainY = getTerrainHeight(ref.current.position.x, -ref.current.position.z, planetName);
 
-            ref.current.position.y = terrainY + 0.2;
+            ref.current.position.y = terrainY + 0.35;
           }
         }
 

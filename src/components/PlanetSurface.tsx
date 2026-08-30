@@ -59,7 +59,7 @@ const getPlanetPalette = (planetName: string) => {
 
 function GenerativeTerrain({ planetName, config }: { planetName: string, config: any }) {
     const geometry = useMemo(() => {
-        const geo = new THREE.PlaneGeometry(500, 500, 50, 50);
+        const geo = new THREE.PlaneGeometry(650, 650, 130, 130);
         const pos = geo.attributes.position;
         const colors = new Float32Array(pos.count * 3);
 
@@ -137,7 +137,7 @@ export function PlanetSurface({ planetName, controlsRef }: { planetName: string,
         // Save previous background
         const prevBackground = scene.background;
         scene.background = new THREE.Color(config.fog);
-        
+
         if (planetName === 'Skills') {
             scene.fog = null; // Removed fog completely
         } else if (isContact) {
@@ -145,8 +145,8 @@ export function PlanetSurface({ planetName, controlsRef }: { planetName: string,
         } else {
             scene.fog = null;
         }
-        return () => { 
-            scene.fog = null; 
+        return () => {
+            scene.fog = null;
             scene.background = prevBackground;
         };
     }, [planetName, isContact, config.fog, scene]);
