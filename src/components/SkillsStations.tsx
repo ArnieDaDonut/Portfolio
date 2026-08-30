@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from 'react';
+import { useMemo, useRef, useEffect, useState } from 'react';
 import { useFBX, useAnimations, useGLTF, Html, Sparkles } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -656,6 +656,427 @@ function Path() {
     );
 }
 
+function RainbowFerrisWheelHolo() {
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    const languages = useMemo(() => [
+        { name: 'TypeScript', color: '#38bdf8', icon: 'TS' },
+        { name: 'JavaScript', color: '#facc15', icon: 'JS' },
+        { name: 'Python', color: '#4ade80', icon: 'PY' },
+        { name: 'React', color: '#60a5fa', icon: '⚛' },
+        { name: 'C / C++', color: '#f97316', icon: 'C++' },
+        { name: 'Three.js / 3D', color: '#ec4899', icon: '3D' },
+        { name: 'Node.js', color: '#22c55e', icon: 'NODE' },
+        { name: 'HTML & CSS', color: '#a855f7', icon: '</>' },
+    ], []);
+
+    const next = (e?: any) => {
+        if (e) e.stopPropagation();
+        setActiveIndex((prev) => (prev + 1) % languages.length);
+    };
+
+    const prev = (e?: any) => {
+        if (e) e.stopPropagation();
+        setActiveIndex((prev) => (prev - 1 + languages.length) % languages.length);
+    };
+
+    return (
+        <group position={[0, 4.6, 0.5]}>
+            {/* 3D Holographic Rainbow Arc Ring */}
+            <mesh rotation={[Math.PI / 2.2, 0, 0]}>
+                <torusGeometry args={[2.0, 0.02, 16, 64]} />
+                <meshBasicMaterial color="#38bdf8" transparent opacity={0.5} />
+            </mesh>
+
+            <Html center distanceFactor={14} zIndexRange={[100, 0]}>
+                <div style={{
+                    width: '420px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    fontFamily: '"Press Start 2P", monospace, sans-serif',
+                    userSelect: 'none',
+                    position: 'relative'
+                }}>
+                    {/* Rainbow Holographic Title */}
+                    <div style={{
+                        fontSize: '9px',
+                        background: 'linear-gradient(90deg, #ff007f, #ff7f00, #ffff00, #00ff7f, #00ffff, #7f00ff, #ff007f)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        letterSpacing: '2px',
+                        fontWeight: 'bold',
+                        marginBottom: '16px',
+                        textShadow: '0 0 10px rgba(255, 255, 255, 0.2)',
+                        filter: 'drop-shadow(0 0 8px rgba(0, 229, 255, 0.7))'
+                    }}>
+                        ★ CODING SKILLS ★
+                    </div>
+
+                    {/* Ferris Wheel 3D Arc Container */}
+                    <div style={{
+                        position: 'relative',
+                        width: '380px',
+                        height: '95px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        perspective: '800px'
+                    }}>
+                        {languages.map((lang, idx) => {
+                            let diff = (idx - activeIndex + languages.length) % languages.length;
+                            if (diff > languages.length / 2) diff -= languages.length;
+
+                            // Display items within +/- 2 range of the active item
+                            if (Math.abs(diff) > 2) return null;
+
+                            const isActive = diff === 0;
+                            const isPrev = diff === -1;
+                            const isNext = diff === 1;
+                            const isFarPrev = diff === -2;
+                            const isFarNext = diff === 2;
+
+                            let translateX = 0;
+                            let translateY = 0;
+                            let translateZ = 0;
+                            let scale = 1;
+                            let blur = 0;
+                            let opacity = 1;
+
+                            if (isActive) {
+                                translateX = 0;
+                                translateY = 0;
+                                translateZ = 30;
+                                scale = 1.22;
+                                blur = 0;
+                                opacity = 1;
+                            } else if (isPrev) {
+                                translateX = -115;
+                                translateY = 10;
+                                translateZ = -20;
+                                scale = 0.82;
+                                blur = 2;
+                                opacity = 0.55;
+                            } else if (isNext) {
+                                translateX = 115;
+                                translateY = 10;
+                                translateZ = -20;
+                                scale = 0.82;
+                                blur = 2;
+                                opacity = 0.55;
+                            } else if (isFarPrev) {
+                                translateX = -185;
+                                translateY = 24;
+                                translateZ = -60;
+                                scale = 0.65;
+                                blur = 4;
+                                opacity = 0.25;
+                            } else if (isFarNext) {
+                                translateX = 185;
+                                translateY = 24;
+                                translateZ = -60;
+                                scale = 0.65;
+                                blur = 4;
+                                opacity = 0.25;
+                            }
+
+                            return (
+                                <div
+                                    key={idx}
+                                    onClick={() => setActiveIndex(idx)}
+                                    style={{
+                                        position: 'absolute',
+                                        transform: `translateX(${translateX}px) translateY(${translateY}px) translateZ(${translateZ}px) scale(${scale})`,
+                                        filter: `blur(${blur}px)`,
+                                        opacity: opacity,
+                                        transition: 'all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                        cursor: 'pointer',
+                                        zIndex: isActive ? 10 : 5 - Math.abs(diff),
+                                        padding: isActive ? '12px 18px' : '8px 12px',
+                                        borderRadius: '14px',
+                                        background: isActive
+                                            ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 27, 75, 0.95))'
+                                            : 'rgba(15, 23, 42, 0.75)',
+                                        border: isActive
+                                            ? `2px solid ${lang.color}`
+                                            : `1px solid ${lang.color}55`,
+                                        boxShadow: isActive
+                                            ? `0 0 25px ${lang.color}88, inset 0 0 12px ${lang.color}44`
+                                            : 'none',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                >
+                                    <span style={{
+                                        fontSize: isActive ? '13px' : '9px',
+                                        color: lang.color,
+                                        fontWeight: 'bold',
+                                        textShadow: isActive ? `0 0 10px ${lang.color}` : 'none'
+                                    }}>
+                                        {lang.icon}
+                                    </span>
+                                    <span style={{
+                                        fontSize: isActive ? '9px' : '7px',
+                                        color: isActive ? '#ffffff' : '#94a3b8',
+                                        fontWeight: isActive ? 'bold' : 'normal',
+                                        letterSpacing: '0.5px'
+                                    }}>
+                                        {lang.name}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Navigation Controls & Dot Indicators */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '14px',
+                        marginTop: '10px',
+                        zIndex: 20
+                    }}>
+                        <button
+                            onClick={prev}
+                            style={{
+                                background: 'rgba(0, 229, 255, 0.15)',
+                                border: '1px solid #00e5ff',
+                                color: '#00e5ff',
+                                borderRadius: '50%',
+                                width: '24px',
+                                height: '24px',
+                                fontSize: '9px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 0 8px rgba(0, 229, 255, 0.35)'
+                            }}
+                        >
+                            ◀
+                        </button>
+
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                            {languages.map((_, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => setActiveIndex(i)}
+                                    style={{
+                                        width: i === activeIndex ? '14px' : '5px',
+                                        height: '5px',
+                                        borderRadius: '3px',
+                                        background: i === activeIndex
+                                            ? languages[activeIndex].color
+                                            : 'rgba(255, 255, 255, 0.25)',
+                                        boxShadow: i === activeIndex ? `0 0 8px ${languages[activeIndex].color}` : 'none',
+                                        transition: 'all 0.3s ease',
+                                        cursor: 'pointer'
+                                    }}
+                                />
+                            ))}
+                        </div>
+
+                        <button
+                            onClick={next}
+                            style={{
+                                background: 'rgba(0, 229, 255, 0.15)',
+                                border: '1px solid #00e5ff',
+                                color: '#00e5ff',
+                                borderRadius: '50%',
+                                width: '24px',
+                                height: '24px',
+                                fontSize: '9px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 0 8px rgba(0, 229, 255, 0.35)'
+                            }}
+                        >
+                            ▶
+                        </button>
+                    </div>
+                </div>
+            </Html>
+        </group>
+    );
+}
+
+
+function FloatingSkillsSign() {
+    const ringLeftRef = useRef<THREE.Mesh>(null);
+    const ringRightRef = useRef<THREE.Mesh>(null);
+
+    useFrame((_, delta) => {
+        if (ringLeftRef.current) ringLeftRef.current.rotation.z += delta * 0.8;
+        if (ringRightRef.current) ringRightRef.current.rotation.z -= delta * 0.8;
+    });
+
+    const signTexture = useMemo(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 2048;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return null;
+
+        // Dark Radial Cyber Background
+        const grad = ctx.createRadialGradient(
+            canvas.width / 2, canvas.height / 2, 80,
+            canvas.width / 2, canvas.height / 2, canvas.width / 2
+        );
+        grad.addColorStop(0, 'rgba(28, 10, 58, 0.98)');
+        grad.addColorStop(1, 'rgba(4, 1, 12, 0.99)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Cyber Grid Lines
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)';
+        ctx.lineWidth = 2;
+        const gridSize = 40;
+        for (let x = 0; x < canvas.width; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
+
+        // Cyan Glowing Border
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 8;
+        ctx.strokeRect(12, 12, canvas.width - 24, canvas.height - 24);
+
+        // Cyber Corner Brackets
+        ctx.font = 'bold 50px "Press Start 2P", monospace, sans-serif';
+        ctx.fillStyle = '#00e5ff';
+        ctx.fillText('⌜', 35, 75);
+        ctx.fillText('⌝', canvas.width - 85, 75);
+        ctx.fillStyle = '#c084fc';
+        ctx.fillText('⌞', 35, canvas.height - 40);
+        ctx.fillText('⌟', canvas.width - 85, canvas.height - 40);
+
+        // Multi-Layered Glowing SKILLS Text
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 160px "Press Start 2P", monospace, sans-serif';
+
+        // Outer Violet Bloom
+        ctx.shadowColor = '#a855f7';
+        ctx.shadowBlur = 80;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('SKILLS', canvas.width / 2, canvas.height / 2 + 5);
+
+        // Inner Cyan Bloom
+        ctx.shadowColor = '#00e5ff';
+        ctx.shadowBlur = 40;
+        ctx.fillText('SKILLS', canvas.width / 2, canvas.height / 2 + 5);
+
+        // Crisp White Core
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('SKILLS', canvas.width / 2, canvas.height / 2 + 5);
+
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.needsUpdate = true;
+        return tex;
+    }, []);
+
+    return (
+        <group position={[0, 78, -135]} scale={1.35} rotation={[0.26, 0, 0]}>
+            {/* --- 3D High-Altitude Celestial Sky Monolith --- */}
+
+            {/* Main Obsidian Backing Slabs */}
+            <mesh position={[0, 0, 0]}>
+                <boxGeometry args={[48, 14, 1.6]} />
+                <meshStandardMaterial color="#060312" roughness={0.15} metalness={0.95} />
+            </mesh>
+
+            {/* Glowing Deep Violet Frame */}
+            <mesh position={[0, 0, 0.08]}>
+                <boxGeometry args={[48.8, 14.8, 1.2]} />
+                <meshStandardMaterial color="#2e0854" emissive="#9333ea" emissiveIntensity={0.8} />
+            </mesh>
+
+            {/* Top & Bottom High-Luminance Laser Rails */}
+            <mesh position={[0, 7.2, 0.8]}>
+                <boxGeometry args={[49.4, 0.4, 0.6]} />
+                <meshBasicMaterial color="#00e5ff" />
+            </mesh>
+            <mesh position={[0, -7.2, 0.8]}>
+                <boxGeometry args={[49.4, 0.4, 0.6]} />
+                <meshBasicMaterial color="#c084fc" />
+            </mesh>
+
+            {/* Angled Cyber Wing Pylons (Left & Right) */}
+            <group position={[-25.5, 0, 0]} rotation={[0, 0.25, 0]}>
+                <mesh>
+                    <boxGeometry args={[3.2, 16, 2.0]} />
+                    <meshStandardMaterial color="#0d0824" metalness={0.9} roughness={0.2} />
+                </mesh>
+                <mesh position={[0, 0, 1.1]}>
+                    <boxGeometry args={[0.3, 14, 0.2]} />
+                    <meshBasicMaterial color="#00e5ff" />
+                </mesh>
+                <mesh ref={ringLeftRef} position={[-2.2, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+                    <torusGeometry args={[2.4, 0.12, 16, 32]} />
+                    <meshBasicMaterial color="#00e5ff" />
+                </mesh>
+            </group>
+
+            <group position={[25.5, 0, 0]} rotation={[0, -0.25, 0]}>
+                <mesh>
+                    <boxGeometry args={[3.2, 16, 2.0]} />
+                    <meshStandardMaterial color="#0d0824" metalness={0.9} roughness={0.2} />
+                </mesh>
+                <mesh position={[0, 0, 1.1]}>
+                    <boxGeometry args={[0.3, 14, 0.2]} />
+                    <meshBasicMaterial color="#c084fc" />
+                </mesh>
+                <mesh ref={ringRightRef} position={[2.2, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+                    <torusGeometry args={[2.4, 0.12, 16, 32]} />
+                    <meshBasicMaterial color="#c084fc" />
+                </mesh>
+            </group>
+
+            {/* Bottom Plasma Ion Thrusters */}
+            <mesh position={[-16, -8.2, 0]}>
+                <cylinderGeometry args={[1.4, 1.8, 2.2, 16]} />
+                <meshStandardMaterial color="#1e1b4b" metalness={0.9} />
+            </mesh>
+            <mesh position={[-16, -9.4, 0]}>
+                <sphereGeometry args={[1.1, 16, 16]} />
+                <meshBasicMaterial color="#00e5ff" />
+            </mesh>
+
+            <mesh position={[16, -8.2, 0]}>
+                <cylinderGeometry args={[1.4, 1.8, 2.2, 16]} />
+                <meshStandardMaterial color="#1e1b4b" metalness={0.9} />
+            </mesh>
+            <mesh position={[16, -9.4, 0]}>
+                <sphereGeometry args={[1.1, 16, 16]} />
+                <meshBasicMaterial color="#c084fc" />
+            </mesh>
+
+            {/* Pure 3D WebGL Screen Surface (100% Correct 3D Depth & Zero Clipping) */}
+            {signTexture && (
+                <mesh position={[0, 0, 0.85]}>
+                    <planeGeometry args={[46, 12.5]} />
+                    <meshBasicMaterial map={signTexture} transparent />
+                </mesh>
+            )}
+        </group>
+    );
+}
+
 export function SkillsStations() {
     const deskGltf = useGLTF('/desk.glb');
     const chairGltf = useGLTF('/chair.glb');
@@ -698,6 +1119,7 @@ export function SkillsStations() {
     return (
         <group>
             <MountainsRing />
+            <FloatingSkillsSign />
             {/* Floating Bioluminescent Alien Particles */}
             <Sparkles count={100} position={[0, 10, -120]} scale={[150, 30, 260]} size={7} speed={0.4} color="#d8b4fe" />
             <Sparkles count={60} position={[0, 10, -120]} scale={[120, 20, 200]} size={5} speed={0.6} color="#38bdf8" />
@@ -755,6 +1177,7 @@ export function SkillsStations() {
             {/* Programmer Station */}
             <group position={[codePos.x, codeY, codePos.z]} rotation={[0, -Math.PI / 6, 0]}>
                 <StationPad radius={4.4} color="#00e5ff" />
+                <RainbowFerrisWheelHolo />
 
                 {/* Tech Crates Stack */}
                 <TechCrate position={[2.5, 0.3, 0]} rotation={[0, 0.3, 0]} scale={1.2} color="#00e5ff" />

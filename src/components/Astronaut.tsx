@@ -208,8 +208,8 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
 
         if (planetName && planetName !== 'Contact') {
           const camTerrainY = getTerrainHeight(state.camera.position.x, -state.camera.position.z, planetName);
-          if (state.camera.position.y < camTerrainY + 0.8) {
-            state.camera.position.y = camTerrainY + 0.8;
+          if (state.camera.position.y < camTerrainY + 0.6) {
+            state.camera.position.y = camTerrainY + 0.6;
           }
         }
 

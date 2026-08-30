@@ -184,7 +184,8 @@ export default function App() {
           enableZoom={false}
           enablePan={false}
           enableRotate={true}
-          maxPolarAngle={activePlanet && activePlanet !== 'Contact' ? Math.PI / 2 - 0.05 : Math.PI}
+          maxPolarAngle={Math.PI - 0.1}
+          minPolarAngle={0.05}
           mouseButtons={{
             LEFT: activePlanet ? undefined : THREE.MOUSE.ROTATE,
             RIGHT: THREE.MOUSE.ROTATE
