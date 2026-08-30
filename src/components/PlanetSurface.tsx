@@ -1,7 +1,7 @@
 import { Astronaut } from './Astronaut';
 import { InfoPoint } from './InfoPoint';
-import { useState, useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useState, useRef, useMemo, useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { getTerrainHeight } from '../utils/terrain';
 import { BlackHole } from './BlackHole';
@@ -59,7 +59,7 @@ const getPlanetPalette = (planetName: string) => {
 
 function GenerativeTerrain({ planetName, config }: { planetName: string, config: any }) {
     const geometry = useMemo(() => {
-        const geo = new THREE.PlaneGeometry(500, 500, 128, 128);
+        const geo = new THREE.PlaneGeometry(500, 500, 50, 50);
         const pos = geo.attributes.position;
         const colors = new Float32Array(pos.count * 3);
 
@@ -122,7 +122,7 @@ export function PlanetSurface({ planetName, controlsRef }: { planetName: string,
             case 'About': return { groundColor: '#962d00', skyColor: '#ff7744', fog: '#3b1204' };
             case 'Projects': return { groundColor: '#a88d40', skyColor: '#f4e0a5', fog: '#2a220e' };
             case 'Experience': return { groundColor: '#b86600', skyColor: '#ffbe53', fog: '#422402' };
-            case 'Skills': return { groundColor: '#581c87', skyColor: '#c084fc', fog: '#020617' };
+            case 'Skills': return { groundColor: '#581c87', skyColor: '#c084fc', fog: '#180b2a' };
             case 'Contact': return { groundColor: '#000000', skyColor: '#38bdf8', fog: '#000000' };
             default: return { groundColor: '#1e293b', skyColor: '#0f172a', fog: '#020617' };
         }
@@ -131,11 +131,28 @@ export function PlanetSurface({ planetName, controlsRef }: { planetName: string,
     const config = getPlanetConfig();
     const infoY = isContact ? 2.0 : getTerrainHeight(infoPointPos.x, -infoPointPos.z, planetName) + 1.0;
 
+    const { scene } = useThree();
+
+    useEffect(() => {
+        // Save previous background
+        const prevBackground = scene.background;
+        scene.background = new THREE.Color(config.fog);
+        
+        if (planetName === 'Skills') {
+            scene.fog = null; // Removed fog completely
+        } else if (isContact) {
+            scene.fog = new THREE.Fog('#000000', 5, 35);
+        } else {
+            scene.fog = null;
+        }
+        return () => { 
+            scene.fog = null; 
+            scene.background = prevBackground;
+        };
+    }, [planetName, isContact, config.fog, scene]);
+
     return (
         <group>
-            <color attach="background" args={[config.fog]} />
-            {isContact && <fog attach="fog" args={['#000000', 5, 35]} />}
-
             <ambientLight intensity={isContact ? 0.25 : 0.7} />
             <directionalLight
                 position={isContact ? [0, 5, -5] : [10, 20, 15]}

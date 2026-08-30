@@ -12,6 +12,7 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
   const idleFbx = useFBX('/animations/idle.fbx')
   const walkFbx = useFBX('/animations/walking.fbx')
   const jumpFbx = useFBX('/animations/jump.fbx')
+  const runFbx = useFBX('/animations/Running.fbx')
   const leftStrafeFbx = useFBX('/animations/left strafe walking.fbx')
   const rightStrafeFbx = useFBX('/animations/right strafe walking.fbx')
   const leftTurnFbx = useFBX('/animations/left turn 90.fbx')
@@ -59,10 +60,11 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
     addAnim(rightTurnFbx, "TurnRight")
     addAnim(floatingFbx, "Floating")
     addAnim(swimmingFbx, "Swimming")
+    addAnim(runFbx, "Running")
 
 
     return clips;
-  }, [idleFbx, walkFbx, jumpFbx, leftStrafeFbx, rightStrafeFbx, leftTurnFbx, rightTurnFbx, floatingFbx, swimmingFbx])
+  }, [idleFbx, walkFbx, jumpFbx, leftStrafeFbx, rightStrafeFbx, leftTurnFbx, rightTurnFbx, floatingFbx, swimmingFbx, runFbx])
 
   const { actions } = useAnimations(anims, ref)
 
@@ -97,7 +99,8 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
     if (!ref.current) return;
 
     if (onPlanet) {
-      const moveSpeed = 8 * delta;
+      const isRunning = keys.current['ShiftLeft'] || keys.current['ShiftRight'];
+      const moveSpeed = (isRunning ? 16 : 8) * delta;
       const turnSpeed = 3 * delta;
 
       let isMoving = false;
@@ -157,7 +160,7 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
 
           if (dx !== 0 || dz !== 0) {
             isMoving = true;
-            nextAnim = 'Walk';
+            nextAnim = isRunning ? 'Running' : 'Walk';
 
             const forward = new THREE.Vector3();
             state.camera.getWorldDirection(forward);
