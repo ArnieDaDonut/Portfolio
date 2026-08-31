@@ -123,10 +123,10 @@ export default function App() {
       )}
 
       <Canvas camera={{ position: [0, 2, 10], fov: 45 }}>
-        <color attach="background" args={[activePlanet === 'Contact' ? '#000000' : '#0f1a30']} />
+        <color attach="background" args={[activePlanet === 'Contact' ? '#000000' : '#0a1128']} />
 
-        <ambientLight intensity={activePlanet === 'Contact' ? 0.2 : 0.5} />
-        {activePlanet !== 'Contact' && <directionalLight position={[10, 10, 5]} intensity={1.5} />}
+        <ambientLight intensity={0.8} />
+        <directionalLight position={[10, 15, 10]} intensity={1.8} />
 
         {activePlanet !== 'Contact' && (
           <Stars radius={100} depth={50} count={10000} factor={4} saturation={0} fade speed={1} />
