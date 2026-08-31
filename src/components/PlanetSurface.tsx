@@ -345,6 +345,233 @@ function FloatingContactSign() {
     );
 }
 
+
+// --- Authentic Official Vector Logos ---
+const CONTACT_LINKS = [
+    {
+        name: 'GITHUB',
+        accent: '#a855f7',
+        bg: '#0f0a1e',
+        url: 'https://github.com/ArnieDaDonut',
+        paths: [
+            {
+                color: '#ffffff',
+                d: 'M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z'
+            }
+        ]
+    },
+    {
+        name: 'LINKEDIN',
+        accent: '#38bdf8',
+        bg: '#031428',
+        url: 'https://www.linkedin.com/in/arnav-mandewalker-ba487a340/',
+        paths: [
+            {
+                color: '#0a66c2',
+                d: 'M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z'
+            }
+        ]
+    },
+    {
+        name: 'EMAIL',
+        accent: '#ea4335',
+        bg: '#241402',
+        url: 'mailto:arnav.mandewalker@gmail.com',
+        paths: [
+            { color: '#4285F4', d: 'M2.25 5.25v13.5A2.25 2.25 0 0 0 4.5 21H6.75V9.75L2.25 5.25Z' }, // Google Blue
+            { color: '#34A853', d: 'M21.75 5.25v13.5A2.25 2.25 0 0 1 19.5 21H17.25V9.75L21.75 5.25Z' }, // Google Green
+            { color: '#FBBC04', d: 'M17.25 9.75V3H19.5c1.24 0 2.25 1.01 2.25 2.25L17.25 9.75Z' }, // Google Yellow
+            { color: '#C5221F', d: 'M6.75 9.75L2.25 5.25C2.25 4.01 3.26 3 4.5 3H6.75V9.75Z' }, // Google Dark Red
+            { color: '#EA4335', d: 'M6.75 9.75L12 15L17.25 9.75V3L12 8.25L6.75 3V9.75Z' } // Google Bright Red
+        ]
+    },
+    {
+        name: 'DISCORD',
+        accent: '#818cf8',
+        bg: '#0c0f2e',
+        url: 'https://discord.com/users/arniee420',
+        paths: [
+            {
+                color: '#5865F2',
+                d: 'M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z'
+            }
+        ]
+    },
+    {
+        name: 'INSTAGRAM',
+        accent: '#e1306c',
+        bg: '#1a0515',
+        url: 'https://www.instagram.com/arnav.mannn/',
+        paths: [
+            {
+                color: '#e1306c',
+                d: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z'
+            }
+        ]
+    }
+];
+
+function ContactLogoNode({ item, index, total }: { item: typeof CONTACT_LINKS[0]; index: number; total: number }) {
+    const [hovered, setHover] = useState(false);
+    const meshRef = useRef<THREE.Group>(null);
+
+    // 360° Grand Circular Perimeter around the Astronaut (Radius: 80)
+    const angle = (index / total) * Math.PI * 2;
+    const radius = 80;
+    const posX = Math.sin(angle) * radius;
+    const posZ = Math.cos(angle) * radius;
+    const baseY = 24;
+
+    const texture = useMemo(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1024;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return null;
+
+        ctx.clearRect(0, 0, 1024, 1024);
+
+        // 1. Cyan RGB Chromatic Aberration Glow (Shifted Left)
+        ctx.save();
+        ctx.translate(512 - 368, 512 - 360);
+        ctx.scale(30, 30);
+        item.paths.forEach((p) => {
+            const path2D = new Path2D(p.d);
+            ctx.fillStyle = 'rgba(0, 240, 255, 0.35)';
+            ctx.shadowColor = '#00e5ff';
+            ctx.shadowBlur = 30;
+            ctx.fill(path2D);
+        });
+        ctx.restore();
+
+        // 2. Magenta/Accent Aberration Glow (Shifted Right)
+        ctx.save();
+        ctx.translate(512 - 352, 512 - 360);
+        ctx.scale(30, 30);
+        item.paths.forEach((p) => {
+            const path2D = new Path2D(p.d);
+            ctx.fillStyle = 'rgba(255, 0, 128, 0.3)';
+            ctx.shadowColor = item.accent;
+            ctx.shadowBlur = 30;
+            ctx.fill(path2D);
+        });
+        ctx.restore();
+
+        // 3. Bright Multi-Color Luminous Core
+        ctx.save();
+        ctx.translate(512 - 360, 512 - 360);
+        ctx.scale(30, 30);
+        item.paths.forEach((p) => {
+            const path2D = new Path2D(p.d);
+            ctx.fillStyle = p.color;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 45;
+            ctx.fill(path2D);
+        });
+        ctx.restore();
+
+        // 4. Laser Scanlines Cut Directly Through the Logo
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+        for (let y = 0; y < 1024; y += 12) {
+            ctx.fillRect(0, y, 1024, 4);
+        }
+        ctx.globalCompositeOperation = 'source-over';
+
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.needsUpdate = true;
+        return tex;
+    }, [item]);
+
+    useFrame((state) => {
+        if (meshRef.current) {
+            meshRef.current.position.y = baseY + Math.sin(state.clock.elapsedTime * 1.5 + index * 1.5) * 1.5;
+            const targetScale = hovered ? 1.15 : 1.0;
+            meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.12);
+        }
+    });
+
+    return (
+        <group position={[posX, baseY, posZ]} rotation={[0, angle + Math.PI, 0]}>
+            <group
+                ref={meshRef}
+                onPointerOver={() => {
+                    setHover(true);
+                    document.body.style.cursor = 'pointer';
+                }}
+                onPointerOut={() => {
+                    setHover(false);
+                    document.body.style.cursor = 'auto';
+                }}
+                onClick={() => {
+                    if (item.url.startsWith('mailto:')) {
+                        window.location.href = item.url;
+                    } else {
+                        window.open(item.url, '_blank');
+                    }
+                }}
+            >
+                {/* 1. Back Hologram Ghost Glow Layer */}
+                {texture && (
+                    <mesh position={[0, 0, -0.4]} scale={1.03}>
+                        <planeGeometry args={[64, 64]} />
+                        <meshBasicMaterial
+                            map={texture}
+                            transparent
+                            color="#00e5ff"
+                            opacity={hovered ? 0.6 : 0.35}
+                            side={THREE.DoubleSide}
+                            blending={THREE.AdditiveBlending}
+                            depthWrite={false}
+                        />
+                    </mesh>
+                )}
+
+                {/* 2. Main Sharp Hologram Core Layer */}
+                {texture && (
+                    <mesh position={[0, 0, 0]}>
+                        <planeGeometry args={[64, 64]} />
+                        <meshBasicMaterial
+                            map={texture}
+                            transparent
+                            opacity={hovered ? 1.0 : 0.88}
+                            side={THREE.DoubleSide}
+                            blending={THREE.AdditiveBlending}
+                            depthWrite={false}
+                        />
+                    </mesh>
+                )}
+
+                {/* 3. Front Hologram Fringe Layer */}
+                {texture && (
+                    <mesh position={[0, 0, 0.4]} scale={0.98}>
+                        <planeGeometry args={[64, 64]} />
+                        <meshBasicMaterial
+                            map={texture}
+                            transparent
+                            color={item.accent}
+                            opacity={hovered ? 0.45 : 0.25}
+                            side={THREE.DoubleSide}
+                            blending={THREE.AdditiveBlending}
+                            depthWrite={false}
+                        />
+                    </mesh>
+                )}
+            </group>
+        </group>
+    );
+}
+
+function ContactLogosRing() {
+    return (
+        <group position={[0, 0, 0]}>
+            {CONTACT_LINKS.map((item, idx) => (
+                <ContactLogoNode key={item.name} item={item} index={idx} total={CONTACT_LINKS.length} />
+            ))}
+        </group>
+    );
+}
+
 export function PlanetSurface({ planetName, controlsRef }: { planetName: string, controlsRef?: any }) {
     const isContact = planetName === 'Contact';
     const astroRef = useRef<THREE.Group>(null);
@@ -391,6 +618,9 @@ export function PlanetSurface({ planetName, controlsRef }: { planetName: string,
 
                     {/* High-Altitude Floating Contact Sign */}
                     <FloatingContactSign />
+
+                    {/* Ring of Huge Interactive Contact Logos */}
+                    <ContactLogosRing />
                 </group>
             )}
 
