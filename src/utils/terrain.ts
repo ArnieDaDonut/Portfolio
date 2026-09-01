@@ -37,7 +37,16 @@ export function getTerrainHeight(x: number, z: number, planetName: string) {
 
     height += noise2d(nx * 6.0, nz * 6.0, seed + 200);
 
-    const distFromCenter = Math.min(Math.sqrt(x * x + z * z) / 12, 1.0);
+    let flattenFactor = Math.min(Math.sqrt(x * x + z * z) / 12, 1.0);
 
-    return (height - 5.0) * distFromCenter;
+    // Ensure the terrain is flat under the three Experience basecamps
+    if (planetName === 'Experience') {
+        const d1 = Math.sqrt(x*x + (z - (-16))*(z - (-16))) / 15;
+        const d2 = Math.sqrt((x - (-20))*(x - (-20)) + (z - 5)*(z - 5)) / 15;
+        const d3 = Math.sqrt((x - 20)*(x - 20) + (z - 5)*(z - 5)) / 15;
+        const flattenDist = Math.min(d1, d2, d3, 1.0);
+        flattenFactor = Math.min(flattenFactor, flattenDist);
+    }
+
+    return (height - 5.0) * flattenFactor;
 }

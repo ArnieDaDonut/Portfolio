@@ -4,6 +4,7 @@ import { Stars, Environment, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { PlanetSurface } from './components/PlanetSurface';
 import { PlanetUI } from './components/PlanetUI';
+import { ExperienceUI } from './components/ExperienceUI';
 
 const PLANETS = [
   { path: '/mars_the_red_planet_free.glb', name: 'About', pos: [-6, 20, 10.4] }, // Bottom left
@@ -21,7 +22,12 @@ import { BlackHole } from './components/BlackHole'
 function CameraSnapper({ inSpace, activePlanet, controlsRef }: { inSpace: boolean, activePlanet: string | null, controlsRef: any }) {
   useEffect(() => {
     if (activePlanet && controlsRef.current) {
-      controlsRef.current.object.position.set(0, 8, 16)
+      if (activePlanet === 'Experience') {
+        // Zoomed out camera for the massive greenhouse
+        controlsRef.current.object.position.set(0, 15, 30)
+      } else {
+        controlsRef.current.object.position.set(0, 8, 16)
+      }
       controlsRef.current.target.set(0, 2, 0)
       controlsRef.current.update()
     } else if (inSpace && controlsRef.current) {
@@ -43,7 +49,27 @@ export default function App() {
   const [fading, setFading] = useState(false)
   const [inSpace, setinSpace] = useState(false)
   const [activePlanet, setActivePlanet] = useState<string | null>(null)
+  const [activeExperienceSection, setActiveExperienceSection] = useState<string | null>(null)
   const controlsRef = useRef<any>(null)
+  
+  const handleOpenExperience = (sectionId: string) => {
+    if (fading) return
+    setFading(true)
+    setTimeout(() => {
+      setActiveExperienceSection(sectionId)
+      setFading(false)
+    }, 1500)
+  }
+
+  const handleCloseExperience = () => {
+    if (fading) return
+    setFading(true)
+    setTimeout(() => {
+      setActiveExperienceSection(null)
+      setFading(false)
+    }, 1500)
+  }
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code == 'Space' && !takenOff && !fading) {
@@ -102,9 +128,14 @@ export default function App() {
           opacity: fading ? 1 : 0,
           transition: 'opacity 1.5s ease-in-out',
           pointerEvents: 'none',
-          zIndex: 10
+          zIndex: 10000 // Ensure this overlay is on top of everything including ExperienceUI
         }}
       />
+
+      {/* Experience Fullscreen UI */}
+      {!fading && activeExperienceSection && (
+         <ExperienceUI sectionId={activeExperienceSection} onClose={handleCloseExperience} />
+      )}
 
       {!inSpace && (
         <div className="game-title">
@@ -174,7 +205,7 @@ export default function App() {
           )}
 
           {/* Planetary Surface View */}
-          {activePlanet && <PlanetSurface planetName={activePlanet} controlsRef={controlsRef} />}
+          {activePlanet && <PlanetSurface planetName={activePlanet} controlsRef={controlsRef} onOpenExperience={handleOpenExperience} />}
         </Suspense>
 
         <CameraSnapper inSpace={inSpace} activePlanet={activePlanet} controlsRef={controlsRef} />

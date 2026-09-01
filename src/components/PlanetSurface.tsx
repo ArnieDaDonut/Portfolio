@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { getTerrainHeight } from '../utils/terrain';
 import { BlackHole } from './BlackHole';
 import { SkillsStations } from './SkillsStations';
+import { ExperienceBasecamp } from './ExperienceBasecamp';
 
 interface SurfaceProps {
     planetName: string;
@@ -402,12 +403,66 @@ const CONTACT_LINKS = [
         accent: '#e1306c',
         bg: '#1a0515',
         url: 'https://www.instagram.com/arnav.mannn/',
-        paths: [
-            {
-                color: '#e1306c',
-                d: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z'
-            }
-        ]
+        customRender: (ctx: CanvasRenderingContext2D, size: number) => {
+            const r = 480;
+            const x = size / 2 - r / 2;
+            const y = size / 2 - r / 2;
+            const w = r;
+            const h = r;
+            const radius = 110;
+
+            // 1. Instagram Multi-Stop Gradient Background
+            const grad = ctx.createLinearGradient(x, y + h, x + w, y);
+            grad.addColorStop(0.0, '#ffd600');
+            grad.addColorStop(0.25, '#ff7a00');
+            grad.addColorStop(0.5, '#ff0069');
+            grad.addColorStop(0.75, '#d300c5');
+            grad.addColorStop(1.0, '#7638fa');
+
+            ctx.save();
+            ctx.shadowColor = '#e1306c';
+            ctx.shadowBlur = 45;
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.roundRect(x, y, w, h, radius);
+            ctx.fill();
+
+            // Bottom-Left Yellow Radial Glow
+            const radGrad = ctx.createRadialGradient(x + 50, y + h - 50, 30, x + 50, y + h - 50, 400);
+            radGrad.addColorStop(0, 'rgba(255, 214, 0, 0.95)');
+            radGrad.addColorStop(0.4, 'rgba(255, 122, 0, 0.5)');
+            radGrad.addColorStop(1, 'rgba(255, 0, 105, 0)');
+            ctx.fillStyle = radGrad;
+            ctx.beginPath();
+            ctx.roundRect(x, y, w, h, radius);
+            ctx.fill();
+            ctx.restore();
+
+            // 2. White Camera Glyph
+            ctx.save();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 32;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Outer camera rounded squircle
+            const camPad = 72;
+            ctx.beginPath();
+            ctx.roundRect(x + camPad, y + camPad, w - camPad * 2, h - camPad * 2, 70);
+            ctx.stroke();
+
+            // Center lens circle
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, 74, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Top-right flash dot
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(size / 2 + 102, size / 2 - 102, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
     }
 ];
 
@@ -431,44 +486,48 @@ function ContactLogoNode({ item, index, total }: { item: typeof CONTACT_LINKS[0]
 
         ctx.clearRect(0, 0, 1024, 1024);
 
-        // 1. Cyan RGB Chromatic Aberration Glow (Shifted Left)
-        ctx.save();
-        ctx.translate(512 - 368, 512 - 360);
-        ctx.scale(30, 30);
-        item.paths.forEach((p) => {
-            const path2D = new Path2D(p.d);
-            ctx.fillStyle = 'rgba(0, 240, 255, 0.35)';
-            ctx.shadowColor = '#00e5ff';
-            ctx.shadowBlur = 30;
-            ctx.fill(path2D);
-        });
-        ctx.restore();
+        if ((item as any).customRender) {
+            (item as any).customRender(ctx, 1024);
+        } else if (item.paths) {
+            // 1. Cyan RGB Chromatic Aberration Glow (Shifted Left)
+            ctx.save();
+            ctx.translate(512 - 368, 512 - 360);
+            ctx.scale(30, 30);
+            item.paths.forEach((p) => {
+                const path2D = new Path2D(p.d);
+                ctx.fillStyle = 'rgba(0, 240, 255, 0.35)';
+                ctx.shadowColor = '#00e5ff';
+                ctx.shadowBlur = 30;
+                ctx.fill(path2D);
+            });
+            ctx.restore();
 
-        // 2. Magenta/Accent Aberration Glow (Shifted Right)
-        ctx.save();
-        ctx.translate(512 - 352, 512 - 360);
-        ctx.scale(30, 30);
-        item.paths.forEach((p) => {
-            const path2D = new Path2D(p.d);
-            ctx.fillStyle = 'rgba(255, 0, 128, 0.3)';
-            ctx.shadowColor = item.accent;
-            ctx.shadowBlur = 30;
-            ctx.fill(path2D);
-        });
-        ctx.restore();
+            // 2. Magenta/Accent Aberration Glow (Shifted Right)
+            ctx.save();
+            ctx.translate(512 - 352, 512 - 360);
+            ctx.scale(30, 30);
+            item.paths.forEach((p) => {
+                const path2D = new Path2D(p.d);
+                ctx.fillStyle = 'rgba(255, 0, 128, 0.3)';
+                ctx.shadowColor = item.accent;
+                ctx.shadowBlur = 30;
+                ctx.fill(path2D);
+            });
+            ctx.restore();
 
-        // 3. Bright Multi-Color Luminous Core
-        ctx.save();
-        ctx.translate(512 - 360, 512 - 360);
-        ctx.scale(30, 30);
-        item.paths.forEach((p) => {
-            const path2D = new Path2D(p.d);
-            ctx.fillStyle = p.color;
-            ctx.shadowColor = p.color;
-            ctx.shadowBlur = 45;
-            ctx.fill(path2D);
-        });
-        ctx.restore();
+            // 3. Bright Multi-Color Luminous Core
+            ctx.save();
+            ctx.translate(512 - 360, 512 - 360);
+            ctx.scale(30, 30);
+            item.paths.forEach((p) => {
+                const path2D = new Path2D(p.d);
+                ctx.fillStyle = p.color;
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 45;
+                ctx.fill(path2D);
+            });
+            ctx.restore();
+        }
 
         // 4. Laser Scanlines Cut Directly Through the Logo
         ctx.globalCompositeOperation = 'destination-out';
@@ -572,7 +631,7 @@ function ContactLogosRing() {
     );
 }
 
-export function PlanetSurface({ planetName, controlsRef }: { planetName: string, controlsRef?: any }) {
+export function PlanetSurface({ planetName, controlsRef, onOpenExperience }: { planetName: string, controlsRef?: any, onOpenExperience?: (sectionId: string) => void }) {
     const isContact = planetName === 'Contact';
     const astroRef = useRef<THREE.Group>(null);
 
@@ -591,14 +650,13 @@ export function PlanetSurface({ planetName, controlsRef }: { planetName: string,
     const { scene } = useThree();
 
     useEffect(() => {
-        const prevBackground = scene.background;
         scene.background = new THREE.Color(isContact ? '#000000' : '#0a1128');
         scene.fog = null;
         return () => {
             scene.fog = null;
-            scene.background = prevBackground;
+            scene.background = new THREE.Color('#0a1128');
         };
-    }, [planetName, isContact, config.fog, scene]);
+    }, [planetName, isContact, scene]);
 
     return (
         <group>
@@ -625,6 +683,7 @@ export function PlanetSurface({ planetName, controlsRef }: { planetName: string,
             )}
 
             {planetName === 'Skills' && <SkillsStations />}
+            {planetName === 'Experience' && <ExperienceBasecamp onOpenSection={onOpenExperience} />}
 
             <Astronaut astroRef={astroRef} position={[0, 0.2, 0]} scale={2.5} onPlanet={true} planetName={planetName} controlsRef={controlsRef} />
         </group>
