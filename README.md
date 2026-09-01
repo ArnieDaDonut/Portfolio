@@ -4,14 +4,25 @@ An interactive, 3D, space-themed personal portfolio build to display things abou
 
 Explore planets, traverse land with a 3D astronaut model, and discover information about me!
 
+<img width="1512" height="858" alt="Image" src="https://github.com/user-attachments/assets/e9f94cdd-db67-4ce2-a003-5b1c0ffea4a6" />
+
+
 ## Features
 
 **Interactive Solar System**: Orbit between 3D celestial bodies, including planets, gas giants, and a black hole.
 
+<img width="1512" height="856" alt="Image" src="https://github.com/user-attachments/assets/fc3e57b8-c016-431c-bdab-08b0d8fec5e9" />
+
+
 **3D Astronaut**: Smooth third-person keyboard controls (WASD/Arrow Keys) with animations to explore land!
+
+
 
 **Interactive Stations**: New and cool things in each planet to provide information about myself!
 
+<img width="1512" height="856" alt="Image" src="https://github.com/user-attachments/assets/2c86e578-1994-4c26-ab6b-e57b8c079593" />
+
+<img width="1512" height="982" alt="Image" src="https://github.com/user-attachments/assets/74610d89-b471-45b5-adf0-c5c5b09a9324" />
 
 ## Controls
 
