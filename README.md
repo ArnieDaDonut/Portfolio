@@ -1,32 +1,65 @@
-# React + TypeScript + Vite
+# Arnav's Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+An interactive, 3D, space-themed personal portfolio build to display things about me!
 
-Currently, two official plugins are available:
+Explore planets, traverse land with a 3D astronaut model, and discover information about me!
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+**Interactive Solar System**: Orbit between 3D celestial bodies, including planets, gas giants, and a black hole.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**3D Astronaut**: Smooth third-person keyboard controls (WASD/Arrow Keys) with animations to explore land!
 
-## Expanding the Oxlint configuration
+**Interactive Stations**: New and cool things in each planet to provide information about myself!
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+## Controls
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- Left Click - rotate solar system camera
+- Right Click - rotate camera in planets
+- Click Planet - transition onto a planet's surface
+- On surface:
+    W / Up Arrow: Move Forward
+    S / Down Arrow: Move Backward
+    A / Left Arrow: Turn Left
+    D / Right Arrow: Turn Right
+- Click Holograms: Open interactive screens
+- Return to Orbit: Head back to the solar orbit
+
+
+## Tech Stack
+
+- React 19 + TypeScript for Framework
+- Three.js for 3D Graphics & Physics
+- GSAP for Animation and Motion
+- Vite - build tool to run smoothly
+- Vanilla CSS3 for Styling
+- Vercel for Deployment
+
+
+## How to Run:
+
+### Prerequisites
+- Node.js (v18+ Recommended)
+
+## Installation
+1. Clone the repository
+
+2. Install dependencies: 
+
+    npm install
+
+3. Start the local server:
+
+    npm run dev
+
+    Open localhost to view the portfolio!
+
+
+## AI Declaration
+
+AI was used in this project to:
+- Create the random infinite terrain on planet.
+- Implement animations created.
+- Create 3D Movement, proper surface collision, and third-person camera.
+- Debugging.
