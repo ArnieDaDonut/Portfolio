@@ -34,6 +34,7 @@ Explore planets, traverse land with a 3D astronaut model, and discover informati
     S / Down Arrow: Move Backward
     A / Left Arrow: Turn Left
     D / Right Arrow: Turn Right
+    Shift: Run
 - Click Holograms: Open interactive screens
 - Return to Orbit: Head back to the solar orbit
 
