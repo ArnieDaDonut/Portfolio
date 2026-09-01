@@ -5,7 +5,7 @@ import * as THREE from 'three'
 import { getTerrainHeight } from '../utils/terrain';
 
 
-export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace = false, onPlanet = false, planetName = "", astroRef, controlsRef, ...props }: any) {
+export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace = false, onPlanet = false, planetName = "", astroRef, controlsRef, onLanded, ...props }: any) {
   const fbx = useFBX('/animations/astronaut.fbx')
 
   // Load all animations
@@ -235,6 +235,10 @@ export function Astronaut({ position = [0, 0, 0], isTakingOff = false, inSpace =
       ref.current.position.y = THREE.MathUtils.lerp(ref.current.position.y, targetY, delta * speed)
       ref.current.position.x = THREE.MathUtils.lerp(ref.current.position.x, position[0], delta * 10)
       ref.current.position.z = THREE.MathUtils.lerp(ref.current.position.z, position[2], delta * 10)
+
+      if (!isTakingOff && onLanded && Math.abs(ref.current.position.y - targetY) < 0.05) {
+        onLanded()
+      }
 
       if (!isTakingOff) {
         const time = state.clock.elapsedTime

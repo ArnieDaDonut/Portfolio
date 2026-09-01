@@ -5,6 +5,8 @@ import * as THREE from 'three'
 import { PlanetSurface } from './components/PlanetSurface';
 import { PlanetUI } from './components/PlanetUI';
 import { ExperienceUI } from './components/ExperienceUI';
+import { LoadingScreen } from './components/LoadingScreen';
+import { CookieBanner } from './components/CookieBanner';
 
 const PLANETS = [
   { path: '/mars_the_red_planet_free.glb', name: 'About', pos: [-6, 20, 10.4] }, // Bottom left
@@ -48,6 +50,7 @@ export default function App() {
   const [takenOff, setTakenOff] = useState(false)
   const [fading, setFading] = useState(false)
   const [inSpace, setinSpace] = useState(false)
+  const [hasLanded, setHasLanded] = useState(false)
   const [activePlanet, setActivePlanet] = useState<string | null>(null)
   const [activeExperienceSection, setActiveExperienceSection] = useState<string | null>(null)
   const controlsRef = useRef<any>(null)
@@ -72,7 +75,7 @@ export default function App() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code == 'Space' && !takenOff && !fading) {
+      if (event.code == 'Space' && !takenOff && !fading && hasLanded) {
         setTakenOff(true)
         setFading(true)
         setTimeout(() => {
@@ -86,7 +89,7 @@ export default function App() {
 
     return () => window.removeEventListener('keydown', handleKeyDown)
 
-  }, [takenOff, fading])
+  }, [takenOff, fading, hasLanded])
 
   const handleReturn = () => {
     if (!inSpace || fading) return;
@@ -95,6 +98,7 @@ export default function App() {
     setTimeout(() => {
       setinSpace(false);
       setTakenOff(false);
+      setHasLanded(false);
       setFading(false);
     }, 1500);
   }
@@ -120,6 +124,12 @@ export default function App() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
 
+      {/* Loading Screen Overlay */}
+      <LoadingScreen />
+
+      {/* Cookie & Telemetry Banner */}
+      <CookieBanner />
+
       {/* Black Screen Overlay */}
       <div
         style={{
@@ -143,7 +153,7 @@ export default function App() {
         </div>
       )}
 
-      {!takenOff && !inSpace && (
+      {!takenOff && !inSpace && hasLanded && (
         <div className="takeoff-text">
           Press Spacebar to Take Off!
         </div>
@@ -168,7 +178,13 @@ export default function App() {
           {!inSpace && <Earth position={[0, -1.5, 0]} scale={0.015} />}
 
           {!activePlanet && (
-            < Astronaut position={[0, 0.2, 0]} scale={inSpace ? 2 : 1} isTakingOff={takenOff} inSpace={inSpace} />
+            <Astronaut 
+              position={[0, 0.2, 0]} 
+              scale={inSpace ? 2 : 1} 
+              isTakingOff={takenOff} 
+              inSpace={inSpace} 
+              onLanded={() => setHasLanded(true)} 
+            />
           )}
           {/* Change takenOff to inSpace for the Planets! */}
           {inSpace && !activePlanet && (
