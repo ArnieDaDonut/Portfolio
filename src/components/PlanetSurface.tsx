@@ -160,8 +160,8 @@ function HugeWorldAccretionRing() {
 
     return (
         <group position={[0, -1.0, 0]}>
-            {/* Giant Expanded 360° Accretion Ring encircling the entire horizon */}
-            <mesh rotation={[-Math.PI / 2 + 0.08, 0, 0]}>
+            {/* Giant Expanded 360° Accretion Ring encircling the entire horizon (raycast disabled so it never blocks clicks) */}
+            <mesh rotation={[-Math.PI / 2 + 0.08, 0, 0]} raycast={() => null}>
                 <ringGeometry args={[8, 300, 128]} />
                 <shaderMaterial
                     ref={ringMatRef}
@@ -550,29 +550,45 @@ function ContactLogoNode({ item, index, total }: { item: typeof CONTACT_LINKS[0]
         }
     });
 
+    const handleOpenLink = (e: any) => {
+        e.stopPropagation();
+        if (item.url.startsWith('mailto:')) {
+            window.location.href = item.url;
+        } else {
+            // Safe DOM anchor click that bypasses Chrome/Safari canvas popup blockers on Vercel
+            const link = document.createElement('a');
+            link.href = item.url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
     return (
         <group position={[posX, baseY, posZ]} rotation={[0, angle + Math.PI, 0]}>
-            <group
-                ref={meshRef}
-                onPointerOver={() => {
-                    setHover(true);
-                    document.body.style.cursor = 'pointer';
-                }}
-                onPointerOut={() => {
-                    setHover(false);
-                    document.body.style.cursor = 'auto';
-                }}
-                onClick={() => {
-                    if (item.url.startsWith('mailto:')) {
-                        window.location.href = item.url;
-                    } else {
-                        window.open(item.url, '_blank');
-                    }
-                }}
-            >
+            <group ref={meshRef}>
+                {/* Dedicated Interactive Hitbox Plane */}
+                <mesh
+                    onClick={handleOpenLink}
+                    onPointerOver={(e) => {
+                        e.stopPropagation();
+                        setHover(true);
+                        document.body.style.cursor = 'pointer';
+                    }}
+                    onPointerOut={() => {
+                        setHover(false);
+                        document.body.style.cursor = 'auto';
+                    }}
+                >
+                    <planeGeometry args={[68, 68]} />
+                    <meshBasicMaterial transparent opacity={0} depthWrite={false} side={THREE.DoubleSide} />
+                </mesh>
+
                 {/* 1. Back Hologram Ghost Glow Layer */}
                 {texture && (
-                    <mesh position={[0, 0, -0.4]} scale={1.03}>
+                    <mesh position={[0, 0, -0.4]} scale={1.03} raycast={() => null}>
                         <planeGeometry args={[64, 64]} />
                         <meshBasicMaterial
                             map={texture}
@@ -588,7 +604,7 @@ function ContactLogoNode({ item, index, total }: { item: typeof CONTACT_LINKS[0]
 
                 {/* 2. Main Sharp Hologram Core Layer */}
                 {texture && (
-                    <mesh position={[0, 0, 0]}>
+                    <mesh position={[0, 0, 0]} scale={1.0} raycast={() => null}>
                         <planeGeometry args={[64, 64]} />
                         <meshBasicMaterial
                             map={texture}
@@ -603,7 +619,7 @@ function ContactLogoNode({ item, index, total }: { item: typeof CONTACT_LINKS[0]
 
                 {/* 3. Front Hologram Fringe Layer */}
                 {texture && (
-                    <mesh position={[0, 0, 0.4]} scale={0.98}>
+                    <mesh position={[0, 0, 0.4]} scale={0.98} raycast={() => null}>
                         <planeGeometry args={[64, 64]} />
                         <meshBasicMaterial
                             map={texture}
