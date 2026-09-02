@@ -377,7 +377,7 @@ const CONTACT_LINKS = [
         name: 'EMAIL',
         accent: '#ea4335',
         bg: '#241402',
-        url: 'mailto:arnav.mandewalker@gmail.com',
+        url: 'https://mail.google.com/mail/?view=cm&fs=1&to=arnav.mandewalker@gmail.com',
         paths: [
             { color: '#4285F4', d: 'M2.25 5.25v13.5A2.25 2.25 0 0 0 4.5 21H6.75V9.75L2.25 5.25Z' }, // Google Blue
             { color: '#34A853', d: 'M21.75 5.25v13.5A2.25 2.25 0 0 1 19.5 21H17.25V9.75L21.75 5.25Z' }, // Google Green
@@ -552,18 +552,14 @@ function ContactLogoNode({ item, index, total }: { item: typeof CONTACT_LINKS[0]
 
     const handleOpenLink = (e: any) => {
         e.stopPropagation();
-        if (item.url.startsWith('mailto:')) {
-            window.location.href = item.url;
-        } else {
-            // Safe DOM anchor click that bypasses Chrome/Safari canvas popup blockers on Vercel
-            const link = document.createElement('a');
-            link.href = item.url;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+        // Safe DOM anchor click that opens in new tab and bypasses browser popup blockers
+        const link = document.createElement('a');
+        link.href = item.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     return (
